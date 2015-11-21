@@ -2,85 +2,82 @@ package gupiao.general;
 
 public class Stock {
     private String code;
-    private String date;
+    private String name;
     private float closePrice;
-    private float ema12;
-    private float ema26;
-    private float diff;
-    private float signal;
-    private float histogram;
+    private float increaseRate;
+    private long dealNumber;
+    private float changeRate;
+    private float currentMarketPrice;
+    private float totalMarketPrice;
 
-    public Stock(String code, String date, float price) {
+    public Stock(String code, String name) {
         this.code = code;
-        this.date = date;
-        this.closePrice = price;
-        this.ema12 = -1;
-        this.ema26 = -1;
-        this.signal = -1;
-        this.histogram = -1;
+        this.name = name;
     }
 
-    public String getDate() {
-        return date;
-    }
+	public String getCode() {
+		return code;
+	}
 
-    public void setDate(String date) {
-        this.date = date;
-    }
+	public void setCode(String code) {
+		this.code = code;
+	}
 
-    public float getClosePrice() {
-        return closePrice;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setClosePrice(float closePrice) {
-        this.closePrice = closePrice;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public float getEma12() {
-        return ema12;
-    }
+	public float getClosePrice() {
+		return closePrice;
+	}
 
-    public void setEma12(float ema12) {
-        this.ema12 = ema12;
-    }
+	public void setClosePrice(float closePrice) {
+		this.closePrice = closePrice;
+	}
 
-    public float getEma26() {
-        return ema26;
-    }
+	public float getIncreaseRate() {
+		return increaseRate;
+	}
 
-    public void setEma26(float ema26) {
-        this.ema26 = ema26;
-    }
+	public void setIncreaseRate(float increaseRate) {
+		this.increaseRate = increaseRate;
+	}
 
-    public float getDiff() {
-        return diff;
-    }
+	public long getDealNumber() {
+		return dealNumber;
+	}
 
-    public void setDiff(float diff) {
-        this.diff = diff;
-    }
+	public void setDealNumber(long dealAmount) {
+		this.dealNumber = dealAmount;
+	}
 
-    public float getSignal() {
-        return signal;
-    }
+	public float getChangeRate() {
+		return changeRate;
+	}
 
-    public void setSignal(float signal) {
-        this.signal = signal;
-    }
+	public void setChangeRate(float changeRate) {
+		this.changeRate = changeRate;
+	}
 
-    public float getHistogram() {
-        return histogram;
-    }
+	public float getCurrentMarketPrice() {
+		return currentMarketPrice;
+	}
 
-    public void setHistogram(float histogram) {
-        this.histogram = histogram;
-    }
+	public void setCurrentMarketPrice(float currentMarketPrice) {
+		this.currentMarketPrice = currentMarketPrice;
+	}
 
-    public String getCode() {
-        return code;
-    }
+	public float getTotalMarketPrice() {
+		return totalMarketPrice;
+	}
 
-    public void setCode(String code) {
-        this.code = code;
-    }
+	public void setTotalMarketPrice(float totalMarketPrice) {
+		this.totalMarketPrice = totalMarketPrice;
+	}
+
+
 }

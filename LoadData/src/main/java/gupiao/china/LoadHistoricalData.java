@@ -91,6 +91,7 @@ public class LoadHistoricalData {
                 loadData(tokens[0]);
             }
         } catch (Exception e) {
+        	System.err.println("Load data error: " + e);
             e.printStackTrace();
         } finally {
             try {
@@ -104,7 +105,7 @@ public class LoadHistoricalData {
     public static void loadData(String code) {
         if (code.isEmpty())
             return;
-        String fileName="/disk1/gupiao/" + code + ".txt";
+        String fileName= code + ".txt";
         //Check file exist
         File f = new File(fileName);
         String sourceCode;
@@ -120,10 +121,10 @@ public class LoadHistoricalData {
 //            saveDataToFile("/disk1/gupiao/" + code + ".txt", getDataRow(sourceCode,true));
             sourceCode = LoadHistoricalData.getUrlSource("http://money.finance.sina.com.cn/corp/go.php/vMS_MarketHistory/stockid/"
                     + code + ".phtml?year=2015&jidu=1");
-            saveDataToFile("/disk1/gupiao/" + code + ".txt", getDataRow(sourceCode,true));
+            saveDataToFile(fileName, getDataRow(sourceCode,true));
             sourceCode = LoadHistoricalData.getUrlSource("http://money.finance.sina.com.cn/corp/go.php/vMS_MarketHistory/stockid/"
                     + code + ".phtml?year=2015&jidu=2");
-            saveDataToFile("/disk1/gupiao/" + code + ".txt", getDataRow(sourceCode,true));
+            saveDataToFile(fileName, getDataRow(sourceCode,true));
             sourceCode = LoadHistoricalData.getUrlSource("http://money.finance.sina.com.cn/corp/go.php/vMS_MarketHistory/stockid/"
                     + code + ".phtml?year=2015&jidu=3");
             saveDataToFile(fileName, getDataRow(sourceCode,true));
@@ -140,7 +141,7 @@ public class LoadHistoricalData {
     }
 
     public static void main(String[] args) {
-        LoadHistoricalData.loadDataList("/disk1/gupiao/stockList.txt");
+        LoadHistoricalData.loadDataList(args[0]);
         System.out.println("done!");
     }
 }
