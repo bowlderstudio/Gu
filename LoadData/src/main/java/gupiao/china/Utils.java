@@ -69,8 +69,11 @@ public class Utils {
 			s.execute("CREATE INDEX IF NOT EXISTS idx_stocks ON stocks (code)");
 			s.execute("CREATE INDEX IF NOT EXISTS idx_stockDealRecord ON stockDealRecord (code, date)");
 			return connDb;
-		} catch (SQLException | ClassNotFoundException e) {
+		} catch (SQLException e) {
 			System.err.println("conn localdb error: " + e);
+			e.printStackTrace();
+			return null;
+		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 			return null;
 		}
