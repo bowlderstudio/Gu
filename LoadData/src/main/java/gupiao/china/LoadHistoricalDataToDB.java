@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Properties;
@@ -86,26 +87,33 @@ public class LoadHistoricalDataToDB {
 
 	private void saveStockDealToDB(StockDealRecord stockDeal) {
 		try {
-			PreparedStatement psL = conn.prepareStatement("INSERT INTO stockDealRecord"
-					+ " (code,name,date,openPrice,closePrice,highestPrice,lowestPrice,dealAmount,dealNumber) "
-					+ "VALUES (?,?,?,?,?,?,?,?,?)");
-
-			psL.setString(1, stockDeal.getCode());
-			psL.setString(2, stockDeal.getName());
-			psL.setString(3, stockDeal.getDate());
-			psL.setFloat(4, stockDeal.getOpenPrice());
-			psL.setFloat(5, stockDeal.getClosePrice());
-			psL.setFloat(6, stockDeal.getHighestPrice());
-			psL.setFloat(7, stockDeal.getLowestPrice());
-			psL.setLong(8, stockDeal.getDealAmount());
-			psL.setLong(9, stockDeal.getDealNumber());
-
-			psL.execute();
-			conn.commit();
+			PreparedStatement psL = conn.prepareStatement("SELECT * FROM stockDealRecord WHERE date=? AND code=?");
+			psL.setString(1, stockDeal.getDate());
+			psL.setString(2, stockDeal.getCode());
+			ResultSet rsL = psL.executeQuery();
+			if (!rsL.next()) {
+				psL = conn.prepareStatement("INSERT INTO stockDealRecord"
+						+ " (code,name,date,openPrice,closePrice,highestPrice,lowestPrice,dealAmount,dealNumber) "
+						+ "VALUES (?,?,?,?,?,?,?,?,?)");
+	
+				psL.setString(1, stockDeal.getCode());
+				psL.setString(2, stockDeal.getName());
+				psL.setString(3, stockDeal.getDate());
+				psL.setFloat(4, stockDeal.getOpenPrice());
+				psL.setFloat(5, stockDeal.getClosePrice());
+				psL.setFloat(6, stockDeal.getHighestPrice());
+				psL.setFloat(7, stockDeal.getLowestPrice());
+				psL.setLong(8, stockDeal.getDealAmount());
+				psL.setLong(9, stockDeal.getDealNumber());
+	
+				psL.execute();
+				conn.commit();
+			}
+			rsL.close();
 			psL.close();
 		} catch (SQLException e) {
 			System.err.println("Insert data error: " + e);
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 		
 	}
