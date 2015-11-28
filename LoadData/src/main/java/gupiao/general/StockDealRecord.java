@@ -9,13 +9,23 @@ public class StockDealRecord {
     private float lowestPrice;
     private float closePrice;
     private long dealNumber;
-    private long dealAmount;
+    private float dealAmount;
     private float ema12;
     private float ema26;
     private float diff;
     private float signal;
     private float histogram;
 
+    public StockDealRecord(String code, String date, float price) {
+    	this.code=code;
+    	this.date=date;
+    	this.closePrice=price;
+    	this.ema12 = -1;
+        this.ema26 = -1;
+        this.signal = -1;
+        this.histogram = -1;
+    }
+    
     public StockDealRecord() {
         this.ema12 = -1;
         this.ema26 = -1;
@@ -79,11 +89,11 @@ public class StockDealRecord {
 		this.dealNumber = Long.parseLong(dealNumber);
 	}
 
-	public long getDealAmount() {
+	public float getDealAmount() {
 		return dealAmount;
 	}
 
-	public void setDealAmount(long dealAmount) {
+	public void setDealAmount(float dealAmount) {
 		this.dealAmount = dealAmount;
 	}
 	

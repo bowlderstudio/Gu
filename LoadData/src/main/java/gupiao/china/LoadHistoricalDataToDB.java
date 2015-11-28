@@ -103,7 +103,7 @@ public class LoadHistoricalDataToDB {
 				psL.setFloat(5, stockDeal.getClosePrice());
 				psL.setFloat(6, stockDeal.getHighestPrice());
 				psL.setFloat(7, stockDeal.getLowestPrice());
-				psL.setLong(8, stockDeal.getDealAmount());
+				psL.setFloat(8, stockDeal.getDealAmount());
 				psL.setLong(9, stockDeal.getDealNumber());
 	
 				psL.execute();
