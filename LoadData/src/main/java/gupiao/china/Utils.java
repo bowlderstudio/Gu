@@ -1,7 +1,9 @@
 package gupiao.china;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -95,4 +97,38 @@ public class Utils {
         }
         return a.toString();
     }
+	
+	public static void saveDataToFile(String filename, String data) {
+        if (data.isEmpty())
+            return;
+        try {
+            File newTextFile = new File(filename);
+
+            FileWriter fw = new FileWriter(newTextFile, true);
+            fw.write(data);
+            fw.close();
+
+        } catch (IOException iox) {
+            // do stuff with exception
+            iox.printStackTrace();
+        }
+    }
+	
+	public static void removeFile(String filename) {
+		try {
+
+			File file = new File(filename);
+
+			if (file.delete()) {
+				System.out.println("Old " + file.getName() + " is deleted!");
+			} else {
+				System.out.println("Delete operation is failed.");
+			}
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+		}
+	}
 }

@@ -6,8 +6,6 @@ public class StockAnalysisResult {
 	private float highestPrice;
 	private float lowestPrice;
 	private float currentPrice;
-	private float rateToHigh;
-	private float rateToLow;
 	
 	public String getCode() {
 		return code;
@@ -40,15 +38,17 @@ public class StockAnalysisResult {
 		this.currentPrice = currentPrice;
 	}
 	public float getRateToHigh() {
-		return rateToHigh;
-	}
-	public void setRateToHigh(float rateToHigh) {
-		this.rateToHigh = rateToHigh;
+		return this.currentPrice/this.highestPrice;
 	}
 	public float getRateToLow() {
-		return rateToLow;
+		return this.lowestPrice/this.currentPrice;
 	}
-	public void setRateToLow(float rateToLow) {
-		this.rateToLow = rateToLow;
+	
+	public static String getTitles() {
+		return "code,name,current price, highest price, lowest price, rate to high, rate to low";
+	}
+	
+	public String toString() {
+		return this.code+","+this.name+","+this.currentPrice+","+this.highestPrice+","+this.lowestPrice+","+getRateToHigh()+","+getRateToLow();
 	}
 }

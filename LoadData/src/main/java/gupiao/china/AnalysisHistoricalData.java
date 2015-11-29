@@ -6,6 +6,7 @@ import gupiao.general.StockAnalysisResult;
 import gupiao.general.StockComparator;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -34,8 +35,11 @@ public class AnalysisHistoricalData {
 	private String loadStockListFile;
 	private String analysisResultFile;
 	private String diagramFold;
+	private String stockRecordFold;
 	private String diagramURL;
 	private float highestMarketPrice;
+	private float rateToHigh;
+	private float rateToLow;
 	private boolean downloadDiagram;
 	private HashMap<String, Stock> stockMap;
 
@@ -53,8 +57,11 @@ public class AnalysisHistoricalData {
 		lastDate = p.getProperty("lastDate");
 		diagramFold = p.getProperty("diagramFold");
 		diagramURL = p.getProperty("diagramURL");
+		stockRecordFold = p.getProperty("stockRecordFold");
 		highestMarketPrice = Float.parseFloat(p.getProperty("highestMarketPrice"));
 		downloadDiagram = Boolean.parseBoolean(p.getProperty("downloadDiagram"));
+		rateToHigh = Float.parseFloat(p.getProperty("rateToHigh"));
+		rateToLow = Float.parseFloat(p.getProperty("rateToLow"));
 		conn = Utils.connectLocal(p);
 		if (conn == null) {
 			System.exit(0);
@@ -63,9 +70,14 @@ public class AnalysisHistoricalData {
 
 	public static void main(String[] args) {
 		AnalysisHistoricalData analysisData = new AnalysisHistoricalData(args[0]);
+		analysisData.cleanOldData();
 		analysisData.loadStockList();
 		analysisData.analysisDataList();
 		System.out.println("done!");
+	}
+
+	private void cleanOldData() {
+		Utils.removeFile(analysisResultFile);
 	}
 
 	private void loadStockList() {
@@ -86,9 +98,9 @@ public class AnalysisHistoricalData {
 				String[] tokens = line.split(DELIMITER);
 				Stock stock = new Stock(tokens[0], tokens[1]);
 				stock.setClosePrice(Float.parseFloat(tokens[2]));
-				stock.setIncreaseRate(Float.parseFloat(tokens[3]));
+				stock.setIncreaseRate(Float.parseFloat(tokens[3].replaceAll("%", "")));
 				stock.setDealNumber(Long.parseLong(tokens[4]));
-				stock.setChangeRate(Float.parseFloat(tokens[5]));
+				stock.setChangeRate(Float.parseFloat(tokens[5].replaceAll("%", "")));
 				stock.setCurrentMarketPrice(Float.parseFloat(tokens[6]));
 				stock.setTotalMarketPrice(Float.parseFloat(tokens[7]));
 				stockMap.put(stock.getCode(), stock);
@@ -105,6 +117,7 @@ public class AnalysisHistoricalData {
 	}
 
 	public void analysisDataList() {
+		Utils.saveDataToFile(analysisResultFile, StockAnalysisResult.getTitles()+"\r\n");
 		for (Map.Entry<String, Stock> entry : stockMap.entrySet()) {
 			analysisData(entry.getValue());
 		}
@@ -115,7 +128,8 @@ public class AnalysisHistoricalData {
 		// TODO for debug
 		// if (!stockCode.equals("600735"))
 		// return;
-		List<StockDealRecord> stockRecord = getDealRecord(stockCode);
+		//List<StockDealRecord> stockRecord = getDealRecordFromDB(stockCode);
+		List<StockDealRecord> stockRecord = getDealRecordFromFile(stockCode);
 		if (stockRecord.size() == 0) {
 			return;
 		}
@@ -150,7 +164,7 @@ public class AnalysisHistoricalData {
 		if (!calculateMACD(stockRecord))
 			return;
 
-		if (isExpectedStock(stockRecord)) {
+		if (isExpectedStock(stockRecord) && isExpectedPriceRate(highestPrice, lowestPrice, closePrice)) {
 			sAnalysis = new StockAnalysisResult();
 			sAnalysis.setCode(stock.getCode());
 			sAnalysis.setName(stock.getName());
@@ -160,7 +174,7 @@ public class AnalysisHistoricalData {
 			// System.out.println("step1");
 			String data = sAnalysis.toString() + "\r\n";
 
-			LoadHistoricalData.saveDataToFile(analysisResultFile, data);
+			Utils.saveDataToFile(analysisResultFile, data);
 			// download diagram
 			if (downloadDiagram) {
 				String imageUrl;
@@ -186,6 +200,13 @@ public class AnalysisHistoricalData {
 				&& isExceptedPrice(stockRecord.get(stockRecord.size() - 1).getClosePrice());
 	}
 
+	private boolean isExpectedPriceRate(float highestPrice, float lowestPrice, float currentPrice) {
+		if (currentPrice/highestPrice < this.rateToHigh
+				&& lowestPrice/currentPrice > this.rateToLow)
+			return true;
+		return false;
+	}
+
 	private boolean isExpectedMarketPrice(String code) {
 		return stockMap.get(code).getTotalMarketPrice() <= highestMarketPrice;
 	}
@@ -197,7 +218,7 @@ public class AnalysisHistoricalData {
 		return false;
 	}
 
-	private List<StockDealRecord> getDealRecord(String code) {
+	private List<StockDealRecord> getDealRecordFromDB(String code) {
 		List<StockDealRecord> records = new ArrayList<StockDealRecord>();
 		try {
 			PreparedStatement psL = conn
@@ -212,9 +233,9 @@ public class AnalysisHistoricalData {
 				sr.setName(rsL.getString("name"));
 				sr.setDate(rsL.getString("date"));
 				sr.setOpenPrice(rsL.getFloat("openPrice"));
-				sr.setOpenPrice(rsL.getFloat("closePrice"));
-				sr.setOpenPrice(rsL.getFloat("highestPrice"));
-				sr.setOpenPrice(rsL.getFloat("lowestPrice"));
+				sr.setClosePrice(rsL.getFloat("closePrice"));
+				sr.setHighestPrice(rsL.getFloat("highestPrice"));
+				sr.setLowestPrice(rsL.getFloat("lowestPrice"));
 				sr.setDealAmount(rsL.getFloat("dealAmount"));
 				sr.setDealNumber(rsL.getLong("dealNumber"));
 				records.add(sr);
@@ -228,6 +249,51 @@ public class AnalysisHistoricalData {
 		return records;
 	}
 
+	private List<StockDealRecord> getDealRecordFromFile(String stockCode) {
+		List<StockDealRecord> records = new ArrayList<StockDealRecord>();
+		
+		String fileName=stockRecordFold+"/" + stockCode + ".txt";
+        
+        File f = new File(fileName);
+        if(!f.exists()) {
+        	System.out.println("Data for stock " + stockCode +" does not exist!");
+        	return records;
+        }
+        BufferedReader fileReader = null;
+        // Delimiter used in CSV file
+        final String DELIMITER = ",";
+        try {
+        	//Check file exist
+            String line = "";
+            // Create the file reader
+            fileReader = new BufferedReader(new FileReader(fileName));
+            while ((line = fileReader.readLine()) != null) {
+                // Get all tokens available in line
+                String[] tokens = line.split(DELIMITER);
+                if (tokens[0].startsWith("#"))
+                    continue;
+                StockDealRecord sr=new StockDealRecord();
+                sr.setCode(stockCode);
+				sr.setName(stockCode);
+				sr.setDate(tokens[0]);
+				sr.setOpenPrice(tokens[1]);
+				sr.setHighestPrice(tokens[2]);
+				sr.setClosePrice(tokens[3]);
+				sr.setLowestPrice(tokens[4]);
+				sr.setDealNumber(tokens[5]);
+				sr.setDealAmount(tokens[6]);
+				records.add(sr);
+            }
+            // Sort data by date first
+    		Collections.sort(records, new StockComparator());
+    		
+		} catch (Exception e) {
+			System.err.println("fetch data for " + stockCode + " error: " + e);
+			e.printStackTrace();
+		}
+		return records;
+	}
+	
 	private static float calculateMACDIncreaseRate(String field, List<StockDealRecord> stocks) {
 		float lastDay = 0, last2Day = 0;
 		if (field.equalsIgnoreCase("HISTOGRAM")) {
@@ -308,8 +374,6 @@ public class AnalysisHistoricalData {
 		int shortdays = 12;
 		int longdays = 26;
 		int signaldays = 9;
-		// Sort data by date first
-		Collections.sort(stocks, new StockComparator());
 		if (stocks.size() < 40) {
 			System.out.println("Too little date to calculate MACD");
 			return false;
