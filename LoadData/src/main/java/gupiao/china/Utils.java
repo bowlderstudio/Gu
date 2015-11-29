@@ -1,19 +1,21 @@
 package gupiao.china;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.MalformedURLException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
+
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 public class Utils {
 
@@ -81,23 +83,31 @@ public class Utils {
 		}
 	}
 	
-	public static String getUrlSource(String url) {
-        StringBuilder a = new StringBuilder();
-        try {
-            URL u = new URL(url);
-            URLConnection uc = u.openConnection();
-            BufferedReader in = new BufferedReader(new InputStreamReader(uc.getInputStream(), "gb2312"));
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-            	System.out.println(inputLine);
-                a.append(inputLine);
-            }
-            in.close();
+	public static String getUrlSource(String url, String code, String errorFile) {
 
-        } catch (Exception e) {
-        	System.err.println("Error when get url source!");
-        }
-        return a.toString();
+		java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(java.util.logging.Level.OFF);
+	    java.util.logging.Logger.getLogger("org.apache.http").setLevel(java.util.logging.Level.OFF);
+
+        @SuppressWarnings("resource")
+		final WebClient webclient = new WebClient(BrowserVersion.CHROME);
+        HtmlPage page;
+		try {
+			page = webclient.getPage(url);
+			//System.out.println("PULLING LINKS:"+page.asXml());
+			return page.asXml();
+		} catch (FailingHttpStatusCodeException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+		}
+		Utils.saveDataToFile(errorFile, code+"\r\n");
+		return "";
+        
     }
 	
 	public static void saveDataToFile(String filename, String data) {

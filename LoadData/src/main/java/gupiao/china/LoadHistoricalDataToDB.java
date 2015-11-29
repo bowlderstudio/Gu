@@ -17,6 +17,7 @@ public class LoadHistoricalDataToDB {
 	private Connection conn;
 	String loadStartDate;
 	String loadStockListFile;
+	String errorFile;
 	private String loadURL;
 	private boolean loadAllData;
 	
@@ -27,6 +28,7 @@ public class LoadHistoricalDataToDB {
 		
 		loadStartDate = p.getProperty("loadStartDate");
 		loadStockListFile= p.getProperty("loadStockListFile");
+		errorFile=p.getProperty("errorFile");
 		loadURL=p.getProperty("loadURL");
 		loadAllData=Boolean.parseBoolean(p.getProperty("loadAllData"));
 		
@@ -38,9 +40,14 @@ public class LoadHistoricalDataToDB {
 	
     public static void main(String[] args) {
     	LoadHistoricalDataToDB loadHistoricalDataToDB=new LoadHistoricalDataToDB(args[0]);
+    	loadHistoricalDataToDB.cleanOldData();
     	loadHistoricalDataToDB.startLoadData();
         System.out.println("done!");
     }
+
+	private void cleanOldData() {
+		Utils.removeFile(this.errorFile);
+	}
 
 	private void startLoadData() {
 		ArrayList<Stock> stockList=getStockList();
@@ -49,7 +56,7 @@ public class LoadHistoricalDataToDB {
 		for (Stock stock:stockList) {
 			System.out.println("Start to load data for code " + stock.getCode());
 			url=loadURL.replaceAll("CODE%", stock.getCode());
-			String content=Utils.getUrlSource(url);
+			String content=Utils.getUrlSource(url,stock.getCode(),errorFile);
 			if (content.isEmpty()) {
 				continue;
 			}
