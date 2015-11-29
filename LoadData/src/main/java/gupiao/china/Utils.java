@@ -84,12 +84,14 @@ public class Utils {
 	public static String getUrlSource(String url) {
         StringBuilder a = new StringBuilder();
         try {
-            URL yahoo = new URL(url);
-            URLConnection yc = yahoo.openConnection();
-            BufferedReader in = new BufferedReader(new InputStreamReader(yc.getInputStream(), "gb2312"));
+            URL u = new URL(url);
+            URLConnection uc = u.openConnection();
+            BufferedReader in = new BufferedReader(new InputStreamReader(uc.getInputStream(), "gb2312"));
             String inputLine;
-            while ((inputLine = in.readLine()) != null)
+            while ((inputLine = in.readLine()) != null) {
+            	System.out.println(inputLine);
                 a.append(inputLine);
+            }
             in.close();
 
         } catch (Exception e) {

@@ -1,0 +1,1 @@
+#date, start price, highest price, close price, lowest price, deal number, deal amount
