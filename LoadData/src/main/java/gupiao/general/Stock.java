@@ -5,11 +5,15 @@ public class Stock {
     private String name;
     private float closePrice;
     private float increaseRate;
-    private long dealNumber;
+    private float dealNumber;
     private float changeRate;
     private float currentMarketPrice;
     private float totalMarketPrice;
 
+    public Stock () {
+    	
+    }
+    
     public Stock(String code, String name) {
         this.code = code;
         this.name = name;
@@ -38,6 +42,10 @@ public class Stock {
 	public void setClosePrice(float closePrice) {
 		this.closePrice = closePrice;
 	}
+	
+	public void setClosePrice(String closePrice) {
+		this.closePrice = Float.parseFloat(closePrice);
+	}
 
 	public float getIncreaseRate() {
 		return increaseRate;
@@ -47,12 +55,20 @@ public class Stock {
 		this.increaseRate = increaseRate;
 	}
 
-	public long getDealNumber() {
+	public void setIncreaseRate(String increaseRate) {
+		this.increaseRate = Float.parseFloat(increaseRate.replaceAll("%", ""));
+	}
+	
+	public float getDealNumber() {
 		return dealNumber;
 	}
 
 	public void setDealNumber(long dealAmount) {
 		this.dealNumber = dealAmount;
+	}
+	
+	public void setDealNumber(String dealAmount) {
+		this.dealNumber = Float.parseFloat(dealAmount.replaceAll(",", ""));
 	}
 
 	public float getChangeRate() {
@@ -63,6 +79,10 @@ public class Stock {
 		this.changeRate = changeRate;
 	}
 
+	public void setChangeRate(String changeRate) {
+		this.changeRate = Float.parseFloat(changeRate.replaceAll("%", ""));
+	}
+	
 	public float getCurrentMarketPrice() {
 		return currentMarketPrice;
 	}
@@ -71,6 +91,10 @@ public class Stock {
 		this.currentMarketPrice = currentMarketPrice;
 	}
 
+	public void setCurrentMarketPrice(String currentMarketPrice) {
+		this.currentMarketPrice = Float.parseFloat(currentMarketPrice.replaceAll(",", ""));
+	}
+	
 	public float getTotalMarketPrice() {
 		return totalMarketPrice;
 	}
@@ -79,5 +103,7 @@ public class Stock {
 		this.totalMarketPrice = totalMarketPrice;
 	}
 
-
+	public void setTotalMarketPrice(String totalMarketPrice) {
+		this.totalMarketPrice = Float.parseFloat(totalMarketPrice.replaceAll(",", ""));
+	}
 }
