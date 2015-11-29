@@ -111,12 +111,11 @@ public class LoadStockListToDB {
 				psL.setFloat(3, stock.getChangeRate());
 				psL.setFloat(4, stock.getClosePrice());
 				psL.setFloat(5, stock.getIncreaseRate());
-				psL.setFloat(6, stock.getCurrentMarketPrice());
-				psL.setFloat(7, stock.getTotalMarketPrice());
+				psL.setBigDecimal(6, stock.getCurrentMarketPrice());
+				psL.setBigDecimal(7, stock.getTotalMarketPrice());
 				psL.setFloat(8, stock.getDealNumber());
 	
 				psL.execute();
-				conn.commit();
 			} else {
 				psL = conn.prepareStatement("UPDATE stocks SET "
 						+ " code=?,name=?,changeRate=?,closePrice=?,increastRate=?,currentMarketPrice=?"
@@ -127,13 +126,12 @@ public class LoadStockListToDB {
 				psL.setFloat(3, stock.getChangeRate());
 				psL.setFloat(4, stock.getClosePrice());
 				psL.setFloat(5, stock.getIncreaseRate());
-				psL.setFloat(6, stock.getCurrentMarketPrice());
-				psL.setFloat(7, stock.getTotalMarketPrice());
+				psL.setBigDecimal(6, stock.getCurrentMarketPrice());
+				psL.setBigDecimal(7, stock.getTotalMarketPrice());
 				psL.setFloat(8, stock.getDealNumber());
 				psL.setString(9, stock.getCode());
 	
 				psL.execute();
-				conn.commit();
 			}
 			rsL.close();
 			psL.close();

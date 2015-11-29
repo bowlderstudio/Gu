@@ -1,5 +1,7 @@
 package gupiao.general;
 
+import java.math.BigDecimal;
+
 public class StockDealRecord {
     private String code;
     private String name;
@@ -8,8 +10,8 @@ public class StockDealRecord {
     private float highestPrice;
     private float lowestPrice;
     private float closePrice;
-    private long dealNumber;
-    private float dealAmount;
+    private BigDecimal dealNumber;
+    private BigDecimal dealAmount;
     private float ema12;
     private float ema26;
     private float diff;
@@ -77,28 +79,28 @@ public class StockDealRecord {
 		this.lowestPrice = Float.parseFloat(lowestPrice);
 	}
 
-	public long getDealNumber() {
+	public BigDecimal getDealNumber() {
 		return dealNumber;
 	}
 
-	public void setDealNumber(long dealNumber) {
+	public void setDealNumber(BigDecimal dealNumber) {
 		this.dealNumber = dealNumber;
 	}
 	
 	public void setDealNumber(String dealNumber) {
-		this.dealNumber = Long.parseLong(dealNumber);
+		this.dealNumber = new BigDecimal(dealNumber);
 	}
 
-	public float getDealAmount() {
+	public BigDecimal getDealAmount() {
 		return dealAmount;
 	}
 
-	public void setDealAmount(float dealAmount) {
+	public void setDealAmount(BigDecimal dealAmount) {
 		this.dealAmount = dealAmount;
 	}
 	
 	public void setDealAmount(String dealAmount) {
-		this.dealAmount = Long.parseLong(dealAmount);
+		this.dealAmount = new BigDecimal(dealAmount);
 	}
 
 	public String getDate() {

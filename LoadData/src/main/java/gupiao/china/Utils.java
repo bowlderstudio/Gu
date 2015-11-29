@@ -46,7 +46,7 @@ public class Utils {
 			Class.forName("org.sqlite.JDBC");
 			Connection connDb = DriverManager.getConnection(p.getProperty("local_conn"),
 					p.getProperty("local_user", ""), p.getProperty("local_password", ""));
-			connDb.setAutoCommit(false);
+			connDb.setAutoCommit(true);
 			
 			Statement s = connDb.createStatement();
 			s.execute("CREATE TABLE IF NOT EXISTS stocks (code VARCHAR(20),name VARCHAR(100),changeRate REAL,closePrice REAL,increastRate REAL,"

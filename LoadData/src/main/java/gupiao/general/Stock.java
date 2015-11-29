@@ -1,5 +1,7 @@
 package gupiao.general;
 
+import java.math.BigDecimal;
+
 public class Stock {
     private String code;
     private String name;
@@ -7,8 +9,8 @@ public class Stock {
     private float increaseRate;
     private float dealNumber;
     private float changeRate;
-    private float currentMarketPrice;
-    private float totalMarketPrice;
+    private BigDecimal currentMarketPrice;
+    private BigDecimal totalMarketPrice;
 
     public Stock () {
     	
@@ -83,27 +85,27 @@ public class Stock {
 		this.changeRate = Float.parseFloat(changeRate.replaceAll("%", ""));
 	}
 	
-	public float getCurrentMarketPrice() {
+	public BigDecimal getCurrentMarketPrice() {
 		return currentMarketPrice;
 	}
 
-	public void setCurrentMarketPrice(float currentMarketPrice) {
+	public void setCurrentMarketPrice(BigDecimal currentMarketPrice) {
 		this.currentMarketPrice = currentMarketPrice;
 	}
 
 	public void setCurrentMarketPrice(String currentMarketPrice) {
-		this.currentMarketPrice = Float.parseFloat(currentMarketPrice.replaceAll(",", ""));
+		this.currentMarketPrice = new BigDecimal(currentMarketPrice.replaceAll(",", ""));
 	}
 	
-	public float getTotalMarketPrice() {
+	public BigDecimal getTotalMarketPrice() {
 		return totalMarketPrice;
 	}
 
-	public void setTotalMarketPrice(float totalMarketPrice) {
+	public void setTotalMarketPrice(BigDecimal totalMarketPrice) {
 		this.totalMarketPrice = totalMarketPrice;
 	}
 
 	public void setTotalMarketPrice(String totalMarketPrice) {
-		this.totalMarketPrice = Float.parseFloat(totalMarketPrice.replaceAll(",", ""));
+		this.totalMarketPrice = new BigDecimal(totalMarketPrice.replaceAll(",", ""));
 	}
 }

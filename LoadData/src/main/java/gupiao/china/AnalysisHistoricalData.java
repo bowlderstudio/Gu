@@ -12,6 +12,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -37,7 +38,7 @@ public class AnalysisHistoricalData {
 	private String diagramFold;
 	private String stockRecordFold;
 	private String diagramURL;
-	private float highestMarketPrice;
+	private BigDecimal highestMarketPrice;
 	private float rateToHigh;
 	private float rateToLow;
 	private boolean downloadDiagram;
@@ -58,7 +59,7 @@ public class AnalysisHistoricalData {
 		diagramFold = p.getProperty("diagramFold");
 		diagramURL = p.getProperty("diagramURL");
 		stockRecordFold = p.getProperty("stockRecordFold");
-		highestMarketPrice = Float.parseFloat(p.getProperty("highestMarketPrice"));
+		highestMarketPrice = new BigDecimal(p.getProperty("highestMarketPrice"));
 		downloadDiagram = Boolean.parseBoolean(p.getProperty("downloadDiagram"));
 		rateToHigh = Float.parseFloat(p.getProperty("rateToHigh"));
 		rateToLow = Float.parseFloat(p.getProperty("rateToLow"));
@@ -101,8 +102,8 @@ public class AnalysisHistoricalData {
 				stock.setIncreaseRate(Float.parseFloat(tokens[3].replaceAll("%", "")));
 				stock.setDealNumber(Long.parseLong(tokens[4]));
 				stock.setChangeRate(Float.parseFloat(tokens[5].replaceAll("%", "")));
-				stock.setCurrentMarketPrice(Float.parseFloat(tokens[6]));
-				stock.setTotalMarketPrice(Float.parseFloat(tokens[7]));
+				stock.setCurrentMarketPrice(tokens[6]);
+				stock.setTotalMarketPrice(tokens[7]);
 				stockMap.put(stock.getCode(), stock);
 			}
 		} catch (Exception e) {
@@ -208,7 +209,7 @@ public class AnalysisHistoricalData {
 	}
 
 	private boolean isExpectedMarketPrice(String code) {
-		return stockMap.get(code).getTotalMarketPrice() <= highestMarketPrice;
+		return stockMap.get(code).getTotalMarketPrice().compareTo(highestMarketPrice) <=0 ;
 	}
 
 	private boolean fuquan(StockDealRecord record1, StockDealRecord record2) {
@@ -236,8 +237,8 @@ public class AnalysisHistoricalData {
 				sr.setClosePrice(rsL.getFloat("closePrice"));
 				sr.setHighestPrice(rsL.getFloat("highestPrice"));
 				sr.setLowestPrice(rsL.getFloat("lowestPrice"));
-				sr.setDealAmount(rsL.getFloat("dealAmount"));
-				sr.setDealNumber(rsL.getLong("dealNumber"));
+				sr.setDealAmount(rsL.getBigDecimal("dealAmount"));
+				sr.setDealNumber(rsL.getBigDecimal("dealNumber"));
 				records.add(sr);
 			}
 			rsL.close();
