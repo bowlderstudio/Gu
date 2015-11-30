@@ -12,11 +12,12 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import gupiao.general.Stock;
+import gupiao.general.StockDealRecord;
 
 public class LoadStockListToDB {
 	private Connection conn;
 	private String marketPriceURL;
-	
+	private String currentDate;
 	public LoadStockListToDB(String propertiesFile) {
 		Properties p = Utils.loadProperties(propertiesFile);
 		if (p == null)
@@ -39,7 +40,9 @@ public class LoadStockListToDB {
 	private void startLoadData(String propertiesFile) throws InterruptedException {
 		WebDriver driver = GUWebDriver.getInstance(propertiesFile);
 		driver.get(marketPriceURL);
-		WebElement element = driver.findElement(By.id("divContainer"));
+		WebElement element = driver.findElement(By.id("spanUpdateTime"));
+		currentDate=element.getText();
+		element = driver.findElement(By.id("divContainer"));
 		String tableSource=element.getAttribute("innerHTML");
         getDataRow(tableSource);
         
@@ -113,7 +116,7 @@ public class LoadStockListToDB {
 				psL.setFloat(5, stock.getIncreaseRate());
 				psL.setBigDecimal(6, stock.getCurrentMarketPrice());
 				psL.setBigDecimal(7, stock.getTotalMarketPrice());
-				psL.setFloat(8, stock.getDealNumber());
+				psL.setBigDecimal(8, stock.getDealNumber());
 	
 				psL.execute();
 			} else {
@@ -128,12 +131,21 @@ public class LoadStockListToDB {
 				psL.setFloat(5, stock.getIncreaseRate());
 				psL.setBigDecimal(6, stock.getCurrentMarketPrice());
 				psL.setBigDecimal(7, stock.getTotalMarketPrice());
-				psL.setFloat(8, stock.getDealNumber());
+				psL.setBigDecimal(8, stock.getDealNumber());
 				psL.setString(9, stock.getCode());
 	
 				psL.execute();
 			}
 			rsL.close();
+			
+			StockDealRecord stockDeal=new StockDealRecord();
+			stockDeal.setCode(stock.getCode());
+			stockDeal.setName(stock.getName());
+			stockDeal.setClosePrice(stock.getClosePrice());
+			stockDeal.setDate(currentDate);
+			stockDeal.setDealNumber(stock.getDealNumber());
+			LoadHistoricalDataToDB.saveStockDealToDB(conn, stockDeal);
+			
 			psL.close();
 		} catch (SQLException e) {
 			System.err.println("Insert/Update data error: " + e);

@@ -7,7 +7,7 @@ public class Stock {
     private String name;
     private float closePrice;
     private float increaseRate;
-    private float dealNumber;
+    private BigDecimal dealNumber;
     private float changeRate;
     private BigDecimal currentMarketPrice;
     private BigDecimal totalMarketPrice;
@@ -61,16 +61,16 @@ public class Stock {
 		this.increaseRate = Float.parseFloat(increaseRate.replaceAll("%", ""));
 	}
 	
-	public float getDealNumber() {
+	public BigDecimal getDealNumber() {
 		return dealNumber;
 	}
 
-	public void setDealNumber(long dealAmount) {
+	public void setDealNumber(BigDecimal dealAmount) {
 		this.dealNumber = dealAmount;
 	}
 	
 	public void setDealNumber(String dealAmount) {
-		this.dealNumber = Float.parseFloat(dealAmount.replaceAll(",", ""));
+		this.dealNumber = new BigDecimal(dealAmount.replaceAll(",", ""));
 	}
 
 	public float getChangeRate() {

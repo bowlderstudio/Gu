@@ -100,7 +100,7 @@ public class AnalysisHistoricalData {
 				Stock stock = new Stock(tokens[0], tokens[1]);
 				stock.setClosePrice(Float.parseFloat(tokens[2]));
 				stock.setIncreaseRate(Float.parseFloat(tokens[3].replaceAll("%", "")));
-				stock.setDealNumber(Long.parseLong(tokens[4]));
+				stock.setDealNumber(new BigDecimal(tokens[4]));
 				stock.setChangeRate(Float.parseFloat(tokens[5].replaceAll("%", "")));
 				stock.setCurrentMarketPrice(tokens[6]);
 				stock.setTotalMarketPrice(tokens[7]);

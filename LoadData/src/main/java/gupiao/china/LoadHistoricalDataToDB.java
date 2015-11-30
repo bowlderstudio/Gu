@@ -17,6 +17,7 @@ public class LoadHistoricalDataToDB {
 	private Connection conn;
 	String loadStartDate;
 	String loadStockListFile;
+	String season;
 	String errorFile;
 	private String loadURL;
 	private boolean loadAllData;
@@ -29,7 +30,8 @@ public class LoadHistoricalDataToDB {
 		loadStartDate = p.getProperty("loadStartDate");
 		loadStockListFile= p.getProperty("loadStockListFile");
 		errorFile=p.getProperty("errorFile");
-		loadURL=p.getProperty("loadURL");
+		season=p.getProperty("season");
+		loadURL=p.getProperty("loadURL")+season;
 		loadAllData=Boolean.parseBoolean(p.getProperty("loadAllData"));
 		
 		conn = Utils.connectLocal(p);
@@ -50,10 +52,13 @@ public class LoadHistoricalDataToDB {
 	}
 
 	private void startLoadData() {
-		ArrayList<Stock> stockList=getStockList();
+		ArrayList<Stock> stockList=getStockListFromDB();//getStockList();
 		StockDealRecord stockDeal;
 		String url;
 		for (Stock stock:stockList) {
+			if (this.hasLoaded(stock.getCode(), season)) {
+				continue;
+			}
 			System.out.println("Start to load data for code " + stock.getCode());
 			url=loadURL.replaceAll("CODE%", stock.getCode());
 			String content=Utils.getUrlSource(url,stock.getCode(),errorFile);
@@ -82,17 +87,35 @@ public class LoadHistoricalDataToDB {
 	            stockDeal.setDealAmount(token[6]);
 	            
 	            if (loadAllData) {
-	            	saveStockDealToDB(stockDeal);
+	            	saveStockDealToDB(conn, stockDeal);
 	            } else if (dataString.substring(0, 10).compareTo(loadStartDate) >=0) {
-	            	saveStockDealToDB(stockDeal);
+	            	saveStockDealToDB(conn, stockDeal);
 	            }
 	            content = content.substring(endIndex);
 	            startIndex = content.indexOf(dataStart);
 	        }
+	        addLoaded(stock.getCode(),season);
 		}
 	}
+	
+	private boolean hasLoaded(String code, String season) {
+		boolean loaded=false;
+		try {
+			PreparedStatement psL = conn.prepareStatement("SELECT * FROM stockLoadRecord WHERE code=? AND season=?");
+			psL.setString(1, code);
+			psL.setString(2, season);
+			ResultSet rsL = psL.executeQuery();
+			if (rsL.next()) {
+				loaded=true;
+			}
+		} catch (SQLException e) {
+			System.err.println("Fetch loaded data error: " + e);
+			e.printStackTrace();
+		}
+		return loaded;
+	}
 
-	private void saveStockDealToDB(StockDealRecord stockDeal) {
+	public static void saveStockDealToDB(Connection conn, StockDealRecord stockDeal) {
 		try {
 			PreparedStatement psL = conn.prepareStatement("SELECT * FROM stockDealRecord WHERE date=? AND code=?");
 			psL.setString(1, stockDeal.getDate());
@@ -114,7 +137,6 @@ public class LoadHistoricalDataToDB {
 				psL.setBigDecimal(9, stockDeal.getDealNumber());
 	
 				psL.execute();
-				conn.commit();
 			}
 			rsL.close();
 			psL.close();
@@ -151,5 +173,45 @@ public class LoadHistoricalDataToDB {
             }
         }
         return stockList;
+	}
+	
+	private ArrayList<Stock> getStockListFromDB() {
+		ArrayList<Stock> stocks=new ArrayList<Stock>();
+		try {
+			PreparedStatement psL = conn.prepareStatement("SELECT * FROM stocks ORDER BY code");
+			ResultSet rsL = psL.executeQuery();
+			while (rsL.next()) {
+				Stock stock=new Stock();
+				stock.setCode(rsL.getString("code"));
+				stock.setName(rsL.getString("name"));
+				stock.setChangeRate(rsL.getFloat("changeRate"));
+				stock.setClosePrice(rsL.getFloat("closePrice"));
+				stock.setIncreaseRate(rsL.getFloat("increastRate"));
+				stock.setCurrentMarketPrice(rsL.getBigDecimal("currentMarketPrice"));
+				stock.setTotalMarketPrice(rsL.getBigDecimal("totalMarketPrice"));
+				stock.setDealNumber(rsL.getBigDecimal("dealNumber"));
+				stocks.add(stock);
+			}
+		} catch (SQLException e) {
+			System.err.println("Fetch stock list error: " + e);
+			e.printStackTrace();
+		}
+			
+		return stocks;
+	}
+	
+	private ArrayList<Stock> addLoaded(String code, String season) {
+		ArrayList<Stock> stocks=new ArrayList<Stock>();
+		try {
+			PreparedStatement psL = conn.prepareStatement("INSERT stockLoadRecord SET code=?, season=?");
+			psL.setString(1, code);
+			psL.setString(2, season);
+			psL.executeQuery();
+		} catch (SQLException e) {
+			System.err.println("Fetch stock list error: " + e);
+			e.printStackTrace();
+		}
+			
+		return stocks;
 	}
 }
