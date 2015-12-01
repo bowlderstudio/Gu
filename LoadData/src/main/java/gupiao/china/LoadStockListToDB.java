@@ -144,7 +144,7 @@ public class LoadStockListToDB {
 			stockDeal.setClosePrice(stock.getClosePrice());
 			stockDeal.setDate(currentDate);
 			stockDeal.setDealNumber(stock.getDealNumber());
-			LoadHistoricalDataToDB.saveStockDealToDB(conn, stockDeal);
+			LoadHistoricalDataToDB.saveStockDealToDB(conn, stockDeal, false);
 			
 			psL.close();
 		} catch (SQLException e) {

@@ -17,7 +17,8 @@ public class LoadHistoricalDataToDB {
 	private Connection conn;
 	String loadStartDate;
 	String loadStockListFile;
-	String season;
+	private boolean LoadURLByWebClient;
+	private static String season;
 	String errorFile;
 	private String loadURL;
 	private boolean loadAllData;
@@ -33,6 +34,7 @@ public class LoadHistoricalDataToDB {
 		season=p.getProperty("season");
 		loadURL=p.getProperty("loadURL")+season;
 		loadAllData=Boolean.parseBoolean(p.getProperty("loadAllData"));
+		LoadURLByWebClient=Boolean.parseBoolean(p.getProperty("LoadURLByWebClient"));
 		
 		conn = Utils.connectLocal(p);
 		if (conn == null) {
@@ -58,43 +60,45 @@ public class LoadHistoricalDataToDB {
 		for (Stock stock:stockList) {
 			if (this.hasLoaded(stock.getCode(), season)) {
 				continue;
+			} else {
+				System.out.println("Start to load data for code " + stock.getCode());
+				url=loadURL.replaceAll("CODE%", stock.getCode());
+				String content=LoadURLByWebClient?Utils.getUrlSourceByWebClient(url)
+						:Utils.getUrlSourceByReader(url);
+				if (content.isEmpty()) {
+					continue;
+				}
+				String dataStart = "<a target='_blank' href='http://vip.stock.finance.sina.com.cn/quotes_service/view/vMS_tradehistory.php?";
+		        String dataEnd = "</tr>";
+		        int startIndex = content.indexOf(dataStart);
+		        int endIndex;
+		        while (startIndex >= 0) {
+		        	content = content.substring(startIndex);
+		            endIndex = content.indexOf(dataEnd);
+		            String dataString = content.substring(0, endIndex);
+		            dataString = Jsoup.parse(dataString).text().replaceAll(" ", ",");
+		            String[] token=Jsoup.parse(dataString).text().split(",");
+		            stockDeal=new StockDealRecord();
+		            stockDeal.setCode(stock.getCode());
+		            stockDeal.setName(stock.getName());
+		            stockDeal.setDate(token[0]);
+		            stockDeal.setOpenPrice(token[1]);
+		            stockDeal.setHighestPrice(token[2]);
+		            stockDeal.setClosePrice(token[3]);
+		            stockDeal.setLowestPrice(token[4]);
+		            stockDeal.setDealNumber(token[5]);
+		            stockDeal.setDealAmount(token[6]);
+		            
+		            if (loadAllData) {
+		            	saveStockDealToDB(conn, stockDeal, true);
+		            } else if (dataString.substring(0, 10).compareTo(loadStartDate) >=0) {
+		            	saveStockDealToDB(conn, stockDeal, true);
+		            }
+		            content = content.substring(endIndex);
+		            startIndex = content.indexOf(dataStart);
+		        }
+		        addLoaded(conn, stock.getCode(),season);
 			}
-			System.out.println("Start to load data for code " + stock.getCode());
-			url=loadURL.replaceAll("CODE%", stock.getCode());
-			String content=Utils.getUrlSource(url,stock.getCode(),errorFile);
-			if (content.isEmpty()) {
-				continue;
-			}
-			String dataStart = "<a target='_blank' href='http://vip.stock.finance.sina.com.cn/quotes_service/view/vMS_tradehistory.php?";
-	        String dataEnd = "</tr>";
-	        int startIndex = content.indexOf(dataStart);
-	        int endIndex;
-	        while (startIndex >= 0) {
-	        	content = content.substring(startIndex);
-	            endIndex = content.indexOf(dataEnd);
-	            String dataString = content.substring(0, endIndex);
-	            dataString = Jsoup.parse(dataString).text().replaceAll(" ", ",");
-	            String[] token=Jsoup.parse(dataString).text().split(",");
-	            stockDeal=new StockDealRecord();
-	            stockDeal.setCode(stock.getCode());
-	            stockDeal.setName(stock.getName());
-	            stockDeal.setDate(token[0]);
-	            stockDeal.setOpenPrice(token[1]);
-	            stockDeal.setHighestPrice(token[2]);
-	            stockDeal.setClosePrice(token[3]);
-	            stockDeal.setLowestPrice(token[4]);
-	            stockDeal.setDealNumber(token[5]);
-	            stockDeal.setDealAmount(token[6]);
-	            
-	            if (loadAllData) {
-	            	saveStockDealToDB(conn, stockDeal);
-	            } else if (dataString.substring(0, 10).compareTo(loadStartDate) >=0) {
-	            	saveStockDealToDB(conn, stockDeal);
-	            }
-	            content = content.substring(endIndex);
-	            startIndex = content.indexOf(dataStart);
-	        }
-	        addLoaded(stock.getCode(),season);
 		}
 	}
 	
@@ -115,7 +119,7 @@ public class LoadHistoricalDataToDB {
 		return loaded;
 	}
 
-	public static void saveStockDealToDB(Connection conn, StockDealRecord stockDeal) {
+	public static void saveStockDealToDB(Connection conn, StockDealRecord stockDeal, boolean allowedUpdate) {
 		try {
 			PreparedStatement psL = conn.prepareStatement("SELECT * FROM stockDealRecord WHERE date=? AND code=?");
 			psL.setString(1, stockDeal.getDate());
@@ -137,17 +141,35 @@ public class LoadHistoricalDataToDB {
 				psL.setBigDecimal(9, stockDeal.getDealNumber());
 	
 				psL.execute();
+			} else if (allowedUpdate){
+				psL = conn.prepareStatement("UPDATE stockDealRecord SET"
+						+ " code=?,name=?,date=?,openPrice=?,closePrice=?,highestPrice=?,lowestPrice=?,dealAmount=?,dealNumber=? "
+						+ " WHERE code=? and date=?");
+	
+				psL.setString(1, stockDeal.getCode());
+				psL.setString(2, stockDeal.getName());
+				psL.setString(3, stockDeal.getDate());
+				psL.setFloat(4, stockDeal.getOpenPrice());
+				psL.setFloat(5, stockDeal.getClosePrice());
+				psL.setFloat(6, stockDeal.getHighestPrice());
+				psL.setFloat(7, stockDeal.getLowestPrice());
+				psL.setBigDecimal(8, stockDeal.getDealAmount());
+				psL.setBigDecimal(9, stockDeal.getDealNumber());
+				psL.setString(10, stockDeal.getCode());
+				psL.setString(11, stockDeal.getDate());
+	
+				psL.execute();
 			}
 			rsL.close();
 			psL.close();
 		} catch (SQLException e) {
-			System.err.println("Insert data error: " + e);
+			System.err.println("Insert/update data error: " + e);
 			e.printStackTrace();
 		}
 		
 	}
 
-	private ArrayList<Stock> getStockList() {
+	private ArrayList<Stock> getStockListFromFile() {
 		BufferedReader fileReader = null;
 		ArrayList<Stock> stockList=new ArrayList<Stock>();
         // Delimiter used in CSV file
@@ -200,13 +222,13 @@ public class LoadHistoricalDataToDB {
 		return stocks;
 	}
 	
-	private ArrayList<Stock> addLoaded(String code, String season) {
+	private static ArrayList<Stock> addLoaded(Connection conn, String code, String season) {
 		ArrayList<Stock> stocks=new ArrayList<Stock>();
 		try {
-			PreparedStatement psL = conn.prepareStatement("INSERT stockLoadRecord SET code=?, season=?");
+			PreparedStatement psL = conn.prepareStatement("INSERT INTO stockLoadRecord (code, season) VALUES (?,?)");
 			psL.setString(1, code);
 			psL.setString(2, season);
-			psL.executeQuery();
+			psL.execute();
 		} catch (SQLException e) {
 			System.err.println("Fetch stock list error: " + e);
 			e.printStackTrace();

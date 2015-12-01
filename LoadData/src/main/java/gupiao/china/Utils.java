@@ -1,11 +1,15 @@
 package gupiao.china;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -86,7 +90,7 @@ public class Utils {
 		}
 	}
 	
-	public static String getUrlSource(String url, String code, String errorFile) {
+	public static String getUrlSourceByWebClient(String url) {
 
 		java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(java.util.logging.Level.OFF);
 	    java.util.logging.Logger.getLogger("org.apache.http").setLevel(java.util.logging.Level.OFF);
@@ -108,11 +112,29 @@ public class Utils {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
 		}
-		Utils.saveDataToFile(errorFile, code+"\r\n");
 		return "";
         
     }
 	
+	public static String getUrlSourceByReader(String url) {
+        StringBuilder a = new StringBuilder();
+        try {
+            URL u = new URL(url);
+            URLConnection uc = u.openConnection();
+            BufferedReader in = new BufferedReader(new InputStreamReader(uc.getInputStream(), "gb2312"));
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+            	//System.out.println(inputLine);
+                a.append(inputLine);
+            }
+            in.close();
+
+        } catch (Exception e) {
+        	System.err.println("Error when get url source!");
+        }
+        return a.toString();
+    }
+
 	public static void saveDataToFile(String filename, String data) {
         if (data.isEmpty())
             return;
