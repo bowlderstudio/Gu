@@ -61,13 +61,13 @@ public class LoadHistoricalDataToDB {
 			if (this.hasLoaded(stock.getCode(), season)) {
 				continue;
 			} else {
-				System.out.println("Start to load data for code " + stock.getCode());
 				url=loadURL.replaceAll("CODE%", stock.getCode());
 				String content=LoadURLByWebClient?Utils.getUrlSourceByWebClient(url)
 						:Utils.getUrlSourceByReader(url);
 				if (content.isEmpty()) {
 					continue;
 				}
+				System.out.println("Start to load data for code " + stock.getCode());
 				String dataStart = "<a target='_blank' href='http://vip.stock.finance.sina.com.cn/quotes_service/view/vMS_tradehistory.php?";
 		        String dataEnd = "</tr>";
 		        int startIndex = content.indexOf(dataStart);

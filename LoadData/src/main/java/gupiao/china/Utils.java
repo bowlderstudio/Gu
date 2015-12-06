@@ -130,7 +130,8 @@ public class Utils {
             in.close();
 
         } catch (Exception e) {
-        	System.err.println("Error when get url source!");
+        	System.err.println("Error when get url source! "+url);
+        	return "";
         }
         return a.toString();
     }

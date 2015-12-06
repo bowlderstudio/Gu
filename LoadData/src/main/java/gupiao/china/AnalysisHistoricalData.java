@@ -129,8 +129,8 @@ public class AnalysisHistoricalData {
 		// TODO for debug
 		// if (!stockCode.equals("600735"))
 		// return;
-		//List<StockDealRecord> stockRecord = getDealRecordFromDB(stockCode);
-		List<StockDealRecord> stockRecord = getDealRecordFromFile(stockCode);
+		List<StockDealRecord> stockRecord = getDealRecordFromDB(stockCode);
+		//List<StockDealRecord> stockRecord = getDealRecordFromFile(stockCode);
 		if (stockRecord.size() == 0) {
 			return;
 		}
@@ -141,7 +141,8 @@ public class AnalysisHistoricalData {
 		float closePrice = 0;
 		float highestPrice = 0;
 		float lowestPrice = 10000;
-
+		int daysFromLastOpen=0;
+		int daysFromLowestPrice=0;
 		StockDealRecord sr;
 		StockAnalysisResult sAnalysis;
 		for (int i = 1; i < stockRecord.size(); i++) {
@@ -149,9 +150,12 @@ public class AnalysisHistoricalData {
 			if (sr.getDate().compareTo(analysisPriceStartDate) < 0) {
 				continue;
 			}
-			if (fuquan(stockRecord.get(i - 1), stockRecord.get(i))) {
+			if (isFuquan(stockRecord.get(i - 1), stockRecord.get(i))) {
 				highestPrice = stockRecord.get(i).getClosePrice();
 				lowestPrice = stockRecord.get(i).getClosePrice();
+				daysFromLastOpen=0;
+			} else {
+				daysFromLastOpen++;
 			}
 			closePrice = sr.getClosePrice();
 			if (closePrice > highestPrice) {
@@ -159,6 +163,9 @@ public class AnalysisHistoricalData {
 			}
 			if (closePrice < lowestPrice) {
 				lowestPrice = closePrice;
+				daysFromLowestPrice=0;
+			} else {
+				daysFromLowestPrice++;
 			}
 		}
 
@@ -172,6 +179,8 @@ public class AnalysisHistoricalData {
 			sAnalysis.setCurrentPrice(closePrice);
 			sAnalysis.setHighestPrice(highestPrice);
 			sAnalysis.setLowestPrice(lowestPrice);
+			sAnalysis.setDaysFromLowestPrice(daysFromLowestPrice);
+			sAnalysis.setDaysFromLastOpen(daysFromLastOpen);
 			// System.out.println("step1");
 			String data = sAnalysis.toString() + "\r\n";
 
@@ -212,7 +221,7 @@ public class AnalysisHistoricalData {
 		return stockMap.get(code).getTotalMarketPrice().compareTo(highestMarketPrice) <=0 ;
 	}
 
-	private boolean fuquan(StockDealRecord record1, StockDealRecord record2) {
+	private boolean isFuquan(StockDealRecord record1, StockDealRecord record2) {
 		if (Math.abs(record1.getClosePrice() - record2.getClosePrice()) / record1.getClosePrice() >= 0.15) {
 			return true;
 		}
@@ -239,7 +248,10 @@ public class AnalysisHistoricalData {
 				sr.setLowestPrice(rsL.getFloat("lowestPrice"));
 				sr.setDealAmount(rsL.getBigDecimal("dealAmount"));
 				sr.setDealNumber(rsL.getBigDecimal("dealNumber"));
-				records.add(sr);
+				//the stock is closed if the price is 0
+				if (sr.getClosePrice()>0) {
+					records.add(sr);
+				}
 			}
 			rsL.close();
 			psL.close();
@@ -283,7 +295,9 @@ public class AnalysisHistoricalData {
 				sr.setLowestPrice(tokens[4]);
 				sr.setDealNumber(tokens[5]);
 				sr.setDealAmount(tokens[6]);
-				records.add(sr);
+				if (sr.getClosePrice()>0) {
+					records.add(sr);
+				}
             }
             // Sort data by date first
     		Collections.sort(records, new StockComparator());
