@@ -72,7 +72,7 @@ public class AnalysisHistoricalData {
 	public static void main(String[] args) {
 		AnalysisHistoricalData analysisData = new AnalysisHistoricalData(args[0]);
 		analysisData.cleanOldData();
-		analysisData.loadStockList();
+		analysisData.loadStockListFromDB();
 		analysisData.analysisDataList();
 		System.out.println("done!");
 	}
@@ -81,6 +81,13 @@ public class AnalysisHistoricalData {
 		Utils.removeFile(analysisResultFile);
 	}
 
+	private void loadStockListFromDB() {
+		stockMap = new HashMap<String, Stock>();
+		ArrayList<Stock> stockList=LoadHistoricalDataToDB.getStockListFromDB(conn);
+		for (Stock stock:stockList) {
+			stockMap.put(stock.getCode(), stock);
+		}
+	}
 	private void loadStockList() {
 		stockMap = new HashMap<String, Stock>();
 		BufferedReader fileReader = null;
@@ -135,7 +142,7 @@ public class AnalysisHistoricalData {
 			return;
 		}
 		// check if the stock has been closed
-		if (!stockRecord.get(stockRecord.size() - 1).getDate().equals(lastDate)) {
+		if (isClosed(stockRecord)) {
 			return;
 		}
 		float closePrice = 0;
@@ -203,6 +210,14 @@ public class AnalysisHistoricalData {
 				}
 			}
 		}
+	}
+
+	private boolean isClosed(List<StockDealRecord> stockRecord) {
+		if (!stockRecord.get(stockRecord.size() - 1).getDate().equals(lastDate)
+				|| stockRecord.get(stockRecord.size() - 1).getDealNumber().compareTo(new BigDecimal(0))==0)
+			return true;
+		else
+			return false;
 	}
 
 	private boolean isExpectedStock(List<StockDealRecord> stockRecord) {

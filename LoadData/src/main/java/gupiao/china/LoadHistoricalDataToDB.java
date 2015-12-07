@@ -54,7 +54,7 @@ public class LoadHistoricalDataToDB {
 	}
 
 	private void startLoadData() {
-		ArrayList<Stock> stockList=getStockListFromDB();//getStockList();
+		ArrayList<Stock> stockList=getStockListFromDB(conn);//getStockList();
 		StockDealRecord stockDeal;
 		String url;
 		for (Stock stock:stockList) {
@@ -197,7 +197,7 @@ public class LoadHistoricalDataToDB {
         return stockList;
 	}
 	
-	private ArrayList<Stock> getStockListFromDB() {
+	public static ArrayList<Stock> getStockListFromDB(Connection conn) {
 		ArrayList<Stock> stocks=new ArrayList<Stock>();
 		try {
 			PreparedStatement psL = conn.prepareStatement("SELECT * FROM stocks ORDER BY code");
