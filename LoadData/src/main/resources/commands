@@ -1,0 +1,6 @@
+scp ubuntu@10.99.3.4:/home/ubuntu/gu/gupiao.db /disk1/git/gu
+scp ubuntu@10.99.3.4:/home/ubuntu/gu/gupiao.db /disk1/git/gu/LoadData/src/main/resources/gupiao.db
+
+sqlite3 /disk1/git/gu/LoadData/src/main/resources/gupiao.db "select * from stockLoadRecord where code='002732';"
+
+sqlite3 /home/ubuntu/gu/gupiao.db "select * from stockLoadRecord where code='002732';"
