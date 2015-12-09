@@ -9,6 +9,18 @@ public class StockAnalysisResult {
 	//days from the last open day
 	private int daysFromLastOpen;
 	private int daysFromLowestPrice;
+	private PriceTrend priceTrend;
+	public enum PriceTrend {
+		GODOWN(1),GOUPGREEN(2),GOUPMIX(3),GOUPRED(4);
+		private int code;
+        private PriceTrend(int code) {
+            this.code = code;
+        }
+        @Override
+        public String toString() {
+            return String.valueOf(code);
+        }
+	};
 	
 	public String getCode() {
 		return code;
@@ -60,11 +72,17 @@ public class StockAnalysisResult {
 		this.daysFromLowestPrice = daysFromLowestPrice;
 	}
 	public static String getTitles() {
-		return "code,name,current price, highest price, lowest price, rate to high, rate to low, days from last open, days from lowest price";
+		return "code,name,current price, highest price, lowest price, rate to high, rate to low, days from last open, days from lowest price, priceTrend";
 	}
 	
+	public PriceTrend getPriceTrend() {
+		return priceTrend;
+	}
+	public void setPriceTrend(PriceTrend priceTrend) {
+		this.priceTrend = priceTrend;
+	}
 	public String toString() {
 		return this.code+","+this.name+","+this.currentPrice+","+this.highestPrice+","
-				+this.lowestPrice+","+getRateToHigh()+","+getRateToLow()+","+this.daysFromLastOpen+","+this.daysFromLowestPrice;
+				+this.lowestPrice+","+getRateToHigh()+","+getRateToLow()+","+this.daysFromLastOpen+","+this.daysFromLowestPrice+","+this.priceTrend.toString();
 	}
 }

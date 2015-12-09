@@ -3,6 +3,7 @@ package gupiao.china;
 import gupiao.general.StockDealRecord;
 import gupiao.general.Stock;
 import gupiao.general.StockAnalysisResult;
+import gupiao.general.StockAnalysisResult.PriceTrend;
 import gupiao.general.StockComparator;
 
 import java.io.BufferedReader;
@@ -43,6 +44,7 @@ public class AnalysisHistoricalData {
 	private float rateToLow;
 	private boolean downloadDiagram;
 	private HashMap<String, Stock> stockMap;
+	private int priceTrendDays=5;
 
 	public AnalysisHistoricalData(String propertiesFile) {
 		Properties p = Utils.loadProperties(propertiesFile);
@@ -181,7 +183,7 @@ public class AnalysisHistoricalData {
 		if (!calculateMACD(stockRecord))
 			return;
 
-		if (isExpectedStock(stockRecord ) && isExpectedPriceRate(highestPrice, lowestPrice, closePrice)) {
+		if (isExpectedStock(stockRecord) && isExpectedPriceRate(highestPrice, lowestPrice, closePrice)) {
 			sAnalysis = new StockAnalysisResult();
 			sAnalysis.setCode(stock.getCode());
 			sAnalysis.setName(stock.getName());
@@ -190,6 +192,7 @@ public class AnalysisHistoricalData {
 			sAnalysis.setLowestPrice(lowestPrice);
 			sAnalysis.setDaysFromLowestPrice(daysFromLowestPrice);
 			sAnalysis.setDaysFromLastOpen(daysFromLastOpen);
+			sAnalysis.setPriceTrend(getPriceTrend(stockRecord));
 			// System.out.println("step1");
 			String data = sAnalysis.toString() + "\r\n";
 
@@ -209,6 +212,33 @@ public class AnalysisHistoricalData {
 					saveImage(imageUrl, diagramFold + "HistogramMinus" + stockCode + ".png");
 				} else if (isMacdDown(stockRecord)) {
 					saveImage(imageUrl, diagramFold + "HistogramDown" + stockCode + ".png");
+				}
+			}
+		}
+	}
+
+	private PriceTrend getPriceTrend(List<StockDealRecord> stockRecord) {
+		if (stockRecord.size()<this.priceTrendDays) {
+			StockDealRecord record=stockRecord.get(stockRecord.size()-1);
+			if (record.getHistogram()<=0) {
+				return StockAnalysisResult.PriceTrend.GODOWN;
+			} else {
+				return StockAnalysisResult.PriceTrend.GOUPRED; 
+			}
+		} else {
+			StockDealRecord startRecord=stockRecord.get(stockRecord.size()-1-priceTrendDays);
+			StockDealRecord endRecord=stockRecord.get(stockRecord.size()-1);
+			if (startRecord.getHistogram()>0 && endRecord.getHistogram()>0) {
+				return StockAnalysisResult.PriceTrend.GOUPRED;
+			} else if (startRecord.getHistogram()<0 && endRecord.getHistogram()>0
+					&& stockRecord.get(stockRecord.size()-2).getHistogram()>0
+					&& stockRecord.get(stockRecord.size()-3).getHistogram()>0){
+				return StockAnalysisResult.PriceTrend.GOUPMIX;
+			} else {
+				if (startRecord.getHistogram()<endRecord.getHistogram()) {
+					return StockAnalysisResult.PriceTrend.GOUPGREEN;
+				} else {
+					return StockAnalysisResult.PriceTrend.GODOWN;
 				}
 			}
 		}
