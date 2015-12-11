@@ -11,9 +11,9 @@ public class StockAnalysisResult {
 	private int daysFromLowestPrice;
 	private PriceTrend priceTrend;
 	public enum PriceTrend {
-		GODOWN(1),GOUPGREEN(2),GOUPMIX(3),GOUPRED(4);
-		private int code;
-        private PriceTrend(int code) {
+		GODOWN("GoDown"),GOUPGREEN("GoUpGreen"),GOUPMIX("GoUpMix"),GOUPRED("GoUpRed");
+		private String code;
+        private PriceTrend(String code) {
             this.code = code;
         }
         @Override
