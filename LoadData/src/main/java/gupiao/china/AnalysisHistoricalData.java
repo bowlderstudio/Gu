@@ -136,7 +136,7 @@ public class AnalysisHistoricalData {
 	private void analysisData(Stock stock) {
 		String stockCode = stock.getCode();
 		// TODO for debug
-		if (stockCode.equals("300066")) {
+		if (stockCode.equals("002780")) {
 			System.out.print("");;
 		}
 		List<StockDealRecord> stockRecord = getDealRecordFromDB(stockCode);
@@ -180,8 +180,8 @@ public class AnalysisHistoricalData {
 			}
 		}
 
-		if (!calculateMACD(stockRecord))
-			return;
+		calculateMACD(stockRecord);
+
 
 		if (isExpectedStock(stockRecord) && isExpectedPriceRate(highestPrice, lowestPrice, closePrice)) {
 			sAnalysis = new StockAnalysisResult();
@@ -258,8 +258,8 @@ public class AnalysisHistoricalData {
 	}
 
 	private boolean isExpectedPriceRate(float highestPrice, float lowestPrice, float currentPrice) {
-		if (currentPrice/highestPrice < this.rateToHigh
-				&& lowestPrice/currentPrice > this.rateToLow)
+		if (currentPrice/highestPrice <= this.rateToHigh
+				&& lowestPrice/currentPrice >= this.rateToLow)
 			return true;
 		return false;
 	}
