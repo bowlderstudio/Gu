@@ -226,7 +226,7 @@ public class AnalysisHistoricalData {
 				return StockAnalysisResult.PriceTrend.GOUPRED; 
 			}
 		} else {
-			StockDealRecord startRecord=stockRecord.get(stockRecord.size()-1-priceTrendDays);
+			StockDealRecord startRecord=stockRecord.get((stockRecord.size()-1-priceTrendDays)>=0?(stockRecord.size()-1-priceTrendDays):0);
 			StockDealRecord endRecord=stockRecord.get(stockRecord.size()-1);
 			if (startRecord.getHistogram()>0 && endRecord.getHistogram()>0) {
 				return StockAnalysisResult.PriceTrend.GOUPRED;
