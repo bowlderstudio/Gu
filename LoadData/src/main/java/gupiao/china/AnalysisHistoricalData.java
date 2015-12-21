@@ -19,12 +19,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 public class AnalysisHistoricalData {
 	private Connection conn;
@@ -45,6 +49,7 @@ public class AnalysisHistoricalData {
 	private boolean downloadDiagram;
 	private HashMap<String, Stock> stockMap;
 	private int priceTrendDays=5;
+	private int minCloseDays;
 
 	public AnalysisHistoricalData(String propertiesFile) {
 		Properties p = Utils.loadProperties(propertiesFile);
@@ -65,6 +70,7 @@ public class AnalysisHistoricalData {
 		downloadDiagram = Boolean.parseBoolean(p.getProperty("downloadDiagram"));
 		rateToHigh = Float.parseFloat(p.getProperty("rateToHigh"));
 		rateToLow = Float.parseFloat(p.getProperty("rateToLow"));
+		minCloseDays = Integer.parseInt(p.getProperty("minCloseDays", "3"));
 		conn = Utils.connectLocal(p);
 		if (conn == null) {
 			System.exit(0);
@@ -137,7 +143,7 @@ public class AnalysisHistoricalData {
 		String stockCode = stock.getCode();
 		// TODO for debug
 		if (stockCode.equals("002780")) {
-			System.out.print("");;
+			System.out.print("");
 		}
 		List<StockDealRecord> stockRecord = getDealRecordFromDB(stockCode);
 		//List<StockDealRecord> stockRecord = getDealRecordFromFile(stockCode);
@@ -160,6 +166,9 @@ public class AnalysisHistoricalData {
 			if (sr.getDate().compareTo(analysisPriceStartDate) < 0) {
 				continue;
 			}
+			if (reOpenStock(stockRecord.get(i - 1), stockRecord.get(i))) {
+				daysFromLastOpen=0;
+			}
 			if (isFuquan(stockRecord.get(i - 1), stockRecord.get(i))) {
 				highestPrice = stockRecord.get(i).getClosePrice();
 				lowestPrice = stockRecord.get(i).getClosePrice();
@@ -181,7 +190,6 @@ public class AnalysisHistoricalData {
 		}
 
 		calculateMACD(stockRecord);
-
 
 		if (isExpectedStock(stockRecord) && isExpectedPriceRate(highestPrice, lowestPrice, closePrice)) {
 			sAnalysis = new StockAnalysisResult();
@@ -215,6 +223,22 @@ public class AnalysisHistoricalData {
 				}
 			}
 		}
+	}
+
+	private boolean reOpenStock(StockDealRecord stockDealRecord, StockDealRecord stockDealRecord2) {
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+
+			Date date1 = formatter.parse(stockDealRecord.getDate());
+			Date date2 = formatter.parse(stockDealRecord2.getDate());
+			long diff = date2.getTime() - date1.getTime();
+			if (TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS)>=minCloseDays) {
+				return true;
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	private PriceTrend getPriceTrend(List<StockDealRecord> stockRecord) {
@@ -474,7 +498,7 @@ public class AnalysisHistoricalData {
 			stocks.get(i).setHistogram((stocks.get(i).getDiff() - stocks.get(i).getSignal()) * 2);
 		}
 
-		// printStocks(stocks);
+//		printStocks(stocks);
 		return true;
 	}
 

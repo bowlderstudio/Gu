@@ -58,6 +58,9 @@ public class StockAnalysisResult {
 	public float getRateToLow() {
 		return this.lowestPrice/this.currentPrice;
 	}
+	public float getPriceRate() {
+		return (this.currentPrice-this.lowestPrice)/(this.highestPrice-this.lowestPrice);
+	}
 	
 	public int getDaysFromLastOpen() {
 		return daysFromLastOpen;
@@ -72,7 +75,7 @@ public class StockAnalysisResult {
 		this.daysFromLowestPrice = daysFromLowestPrice;
 	}
 	public static String getTitles() {
-		return "code,name,current price, highest price, lowest price, rate to high, rate to low, days from last open, days from lowest price, priceTrend";
+		return "code,name,current price, highest price, lowest price, rate to high, rate to low, price rate,days from last open, days from lowest price, priceTrend";
 	}
 	
 	public PriceTrend getPriceTrend() {
@@ -83,6 +86,6 @@ public class StockAnalysisResult {
 	}
 	public String toString() {
 		return this.code+","+this.name+","+this.currentPrice+","+this.highestPrice+","
-				+this.lowestPrice+","+getRateToHigh()+","+getRateToLow()+","+this.daysFromLastOpen+","+this.daysFromLowestPrice+","+this.priceTrend.toString();
+				+this.lowestPrice+","+getRateToHigh()+","+getRateToLow()+","+getPriceRate()+this.daysFromLastOpen+","+this.daysFromLowestPrice+","+this.priceTrend.toString();
 	}
 }
