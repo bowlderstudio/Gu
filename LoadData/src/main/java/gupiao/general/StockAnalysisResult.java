@@ -86,6 +86,6 @@ public class StockAnalysisResult {
 	}
 	public String toString() {
 		return this.code+","+this.name+","+this.currentPrice+","+this.highestPrice+","
-				+this.lowestPrice+","+getRateToHigh()+","+getRateToLow()+","+getPriceRate()+this.daysFromLastOpen+","+this.daysFromLowestPrice+","+this.priceTrend.toString();
+				+this.lowestPrice+","+getRateToHigh()+","+getRateToLow()+","+getPriceRate()+","+this.daysFromLastOpen+","+this.daysFromLowestPrice+","+this.priceTrend.toString();
 	}
 }

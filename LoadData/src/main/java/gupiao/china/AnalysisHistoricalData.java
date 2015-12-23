@@ -46,6 +46,7 @@ public class AnalysisHistoricalData {
 	private BigDecimal highestMarketPrice;
 	private float rateToHigh;
 	private float rateToLow;
+	private float priceRate;
 	private boolean downloadDiagram;
 	private HashMap<String, Stock> stockMap;
 	private int priceTrendDays=5;
@@ -70,6 +71,7 @@ public class AnalysisHistoricalData {
 		downloadDiagram = Boolean.parseBoolean(p.getProperty("downloadDiagram"));
 		rateToHigh = Float.parseFloat(p.getProperty("rateToHigh"));
 		rateToLow = Float.parseFloat(p.getProperty("rateToLow"));
+		priceRate = Float.parseFloat(p.getProperty("priceRate"));
 		minCloseDays = Integer.parseInt(p.getProperty("minCloseDays", "3"));
 		conn = Utils.connectLocal(p);
 		if (conn == null) {
@@ -283,7 +285,8 @@ public class AnalysisHistoricalData {
 
 	private boolean isExpectedPriceRate(float highestPrice, float lowestPrice, float currentPrice) {
 		if (currentPrice/highestPrice <= this.rateToHigh
-				&& lowestPrice/currentPrice >= this.rateToLow)
+				&& lowestPrice/currentPrice >= this.rateToLow
+				&& (currentPrice-lowestPrice)/(highestPrice-lowestPrice) <=this.priceRate)
 			return true;
 		return false;
 	}
