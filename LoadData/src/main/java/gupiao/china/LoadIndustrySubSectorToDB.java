@@ -17,17 +17,17 @@ import org.openqa.selenium.WebElement;
 import gupiao.general.Stock;
 import gupiao.general.StockDealRecord;
 
-public class LoadIndustrySectorToDB2 {
+public class LoadIndustrySubSectorToDB {
 	private Connection conn;
 	private String industrySectorURL;
 	private String[] sectors;
-	public LoadIndustrySectorToDB2(String propertiesFile) {
+	public LoadIndustrySubSectorToDB(String propertiesFile) {
 		Properties p = Utils.loadProperties(propertiesFile);
 		if (p == null)
 			System.exit(1);
 		
-		industrySectorURL=p.getProperty("industrySectorURL");
-		sectors=p.getProperty("sectors").split(";");
+		industrySectorURL=p.getProperty("industrySubSectorURL");
+		sectors=p.getProperty("subSectors").split(";");
 		
 		conn = Utils.connectLocal(p);
 		if (conn == null) {
@@ -36,7 +36,7 @@ public class LoadIndustrySectorToDB2 {
 	}
 	
     public static void main(String[] args) throws InterruptedException {
-    	LoadIndustrySectorToDB2 loadHistoricalDataToDB=new LoadIndustrySectorToDB2(args[0]);
+    	LoadIndustrySubSectorToDB loadHistoricalDataToDB=new LoadIndustrySubSectorToDB(args[0]);
     	loadHistoricalDataToDB.startLoadData(args[0]);
         System.out.println("done!");
     }
@@ -78,7 +78,7 @@ public class LoadIndustrySectorToDB2 {
 			String code=tokens[1].trim();
 			
 			PreparedStatement psL = conn.prepareStatement("UPDATE stocks SET "
-					+ " industrySector=? WHERE code=? ");
+					+ " industrySubSector=? WHERE code=? ");
 
 			psL.setString(1, sector);
 			psL.setString(2, code);
