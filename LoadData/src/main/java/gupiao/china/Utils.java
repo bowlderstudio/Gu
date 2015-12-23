@@ -53,7 +53,7 @@ public class Utils {
 			connDb.setAutoCommit(true);
 			
 			Statement s = connDb.createStatement();
-			s.execute("CREATE TABLE IF NOT EXISTS stocks (code VARCHAR(20),name VARCHAR(100),changeRate REAL,closePrice REAL,increastRate REAL,"
+			s.execute("CREATE TABLE IF NOT EXISTS stocks (code VARCHAR(20),name VARCHAR(100),industrySector VARCHAR(50),changeRate REAL,closePrice REAL,increastRate REAL,"
 					+ "currentMarketPrice NUMERIC,totalMarketPrice NUMERIC,dealNumber BIGINT,PRIMARY KEY (code))");
 			
 			s.execute("CREATE TABLE IF NOT EXISTS stockDealRecord ("
