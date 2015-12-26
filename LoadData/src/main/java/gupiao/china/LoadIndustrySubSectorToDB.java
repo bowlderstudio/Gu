@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import org.jsoup.Jsoup;
@@ -20,14 +21,12 @@ import gupiao.general.StockDealRecord;
 public class LoadIndustrySubSectorToDB {
 	private Connection conn;
 	private String industrySectorURL;
-	private String[] sectors;
 	public LoadIndustrySubSectorToDB(String propertiesFile) {
 		Properties p = Utils.loadProperties(propertiesFile);
 		if (p == null)
 			System.exit(1);
 		
 		industrySectorURL=p.getProperty("industrySubSectorURL");
-		sectors=p.getProperty("subSectors").split(";");
 		
 		conn = Utils.connectLocal(p);
 		if (conn == null) {
@@ -43,20 +42,67 @@ public class LoadIndustrySubSectorToDB {
 
 	private void startLoadData(String propertiesFile) throws InterruptedException {
 		WebDriver driver = GUWebDriver.getInstance(propertiesFile);
-		for (int i=0;i<sectors.length;i++) {
-			driver.get(industrySectorURL+sectors[i]);
-			Thread.sleep(5000);
-			WebElement element = driver.findElement(By.xpath("//table//tbody//tr//td//div//form//font"));
-			String sector=element.getText().replaceAll("板块个股.历史数据回放：", "");
-			element = driver.findElement(By.id("senfe"));
-			String tableSource=element.getAttribute("innerHTML");
-	        getDataRow(sector,tableSource);
+		driver.get(industrySectorURL);
+		Thread.sleep(2000);
+		WebElement element = driver.findElement(By.id("bklist"));
+		if (element==null) {
+			System.out.println("Cannot find bklist");
+			return;
 		}
+		List<WebElement> bkList=element.findElements(By.xpath("//tr//td//a"));
+		List<String> bkListUrl=new ArrayList<String>();
+		for (WebElement e:bkList) {
+			if (e.getAttribute("href").contains("list.html")) {
+				bkListUrl.add(e.getText()+";"+e.getAttribute("href"));
+			}
+		}
+
+		String[] banKuai;
+		for (String bk:bkListUrl) {
+			banKuai=bk.split(";");
+			readBanKuai(driver, banKuai[0],banKuai[1]);
+		}
+
 	}
+	
+	public void readBanKuai(WebDriver driver, String sector,String url) throws InterruptedException {
+		driver.get("http://127.0.0.1/");
+		//driver.get(url);
+		driver.get("http://quote.eastmoney.com/center/list.html#28002465_0_2");
+		Thread.sleep(2000);
+		WebElement element = driver.findElement(By.id("fixed"));
+		if (element==null) {
+			System.out.println("unable find fixed for sector "+sector+", URL="+url);
+			return;
+		}
+
+		String tableSource=element.getAttribute("innerHTML");
+        getDataRow(sector,tableSource);
+        
+        element=driver.findElement(By.id("pagenav"));
+        List<WebElement> aElements=element.findElements(By.xpath("//a"));
+        for (WebElement e:aElements) {
+        	if (e.getText().equalsIgnoreCase("下一页") && e.getAttribute("class").equalsIgnoreCase("disable")) {
+        		break;
+        	} else if (e.getText().equalsIgnoreCase("下一页")) {
+        		e.click();
+        		Thread.sleep(2000);
+        		element = driver.findElement(By.id("fixed"));
+        		if (element==null) {
+        			System.out.println("unable find fixed for sector "+sector+", URL="+url);
+        			return;
+        		}
+
+        		tableSource=element.getAttribute("innerHTML");
+                getDataRow(sector,tableSource);
+                aElements=element.findElements(By.xpath("//a"));
+        	} 
+        }
+    }
 	
 	public void getDataRow(String sector,String content) {
 	    content=content.replaceAll("</td>", ";</td>");
-        String dataStart = "<tr height=";
+        String dataStart = "<tr>";
         String dataEnd = "</tr>";
         int startIndex = content.indexOf(dataStart);
         int endIndex;
@@ -75,6 +121,8 @@ public class LoadIndustrySubSectorToDB {
 	private void saveSectorToDB(String sector, String record) {
 		try {
 			String[] tokens=record.split(";");
+			if (tokens.length<2)
+				return;
 			String code=tokens[1].trim();
 			
 			PreparedStatement psL = conn.prepareStatement("UPDATE stocks SET "

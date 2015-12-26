@@ -197,6 +197,8 @@ public class AnalysisHistoricalData {
 			sAnalysis = new StockAnalysisResult();
 			sAnalysis.setCode(stock.getCode());
 			sAnalysis.setName(stock.getName());
+			sAnalysis.setIndustrySector(stock.getIndustrySector());
+			sAnalysis.setIndustrySubSector(stock.getIndustrySubSector());
 			sAnalysis.setCurrentPrice(closePrice);
 			sAnalysis.setHighestPrice(highestPrice);
 			sAnalysis.setLowestPrice(lowestPrice);

@@ -3,6 +3,8 @@ package gupiao.general;
 public class StockAnalysisResult {	
 	private String code;
 	private String name;
+	private String industrySector;
+	private String industrySubSector;
 	private float highestPrice;
 	private float lowestPrice;
 	private float currentPrice;
@@ -10,6 +12,7 @@ public class StockAnalysisResult {
 	private int daysFromLastOpen;
 	private int daysFromLowestPrice;
 	private PriceTrend priceTrend;
+
 	public enum PriceTrend {
 		GODOWN("GoDown"),GOUPGREEN("GoUpGreen"),GOUPMIX("GoUpMix"),GOUPRED("GoUpRed");
 		private String code;
@@ -75,7 +78,7 @@ public class StockAnalysisResult {
 		this.daysFromLowestPrice = daysFromLowestPrice;
 	}
 	public static String getTitles() {
-		return "code,name,current price, highest price, lowest price, rate to high, rate to low, price rate,days from last open, days from lowest price, priceTrend";
+		return "code,name,current price, highest price, lowest price, rate to high, rate to low, price rate,days from last open, days from lowest price, priceTrend, industrySector, industrySubSector";
 	}
 	
 	public PriceTrend getPriceTrend() {
@@ -84,8 +87,20 @@ public class StockAnalysisResult {
 	public void setPriceTrend(PriceTrend priceTrend) {
 		this.priceTrend = priceTrend;
 	}
+	public String getIndustrySector() {
+		return industrySector;
+	}
+	public void setIndustrySector(String industrySector) {
+		this.industrySector = industrySector;
+	}
+	public String getIndustrySubSector() {
+		return industrySubSector;
+	}
+	public void setIndustrySubSector(String industrySubSector) {
+		this.industrySubSector = industrySubSector;
+	}
 	public String toString() {
 		return this.code+","+this.name+","+this.currentPrice+","+this.highestPrice+","
-				+this.lowestPrice+","+getRateToHigh()+","+getRateToLow()+","+getPriceRate()+","+this.daysFromLastOpen+","+this.daysFromLowestPrice+","+this.priceTrend.toString();
+				+this.lowestPrice+","+getRateToHigh()+","+getRateToLow()+","+getPriceRate()+","+this.daysFromLastOpen+","+this.daysFromLowestPrice+","+this.priceTrend.toString()+","+this.industrySector+","+this.industrySubSector;
 	}
 }

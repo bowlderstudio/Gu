@@ -11,6 +11,8 @@ public class Stock {
     private float changeRate;
     private BigDecimal currentMarketPrice;
     private BigDecimal totalMarketPrice;
+    private String industrySector;
+	private String industrySubSector;
 
     public Stock () {
     	
@@ -107,5 +109,21 @@ public class Stock {
 
 	public void setTotalMarketPrice(String totalMarketPrice) {
 		this.totalMarketPrice = new BigDecimal(totalMarketPrice.replaceAll(",", ""));
+	}
+
+	public String getIndustrySector() {
+		return industrySector;
+	}
+
+	public void setIndustrySector(String industrySector) {
+		this.industrySector = industrySector;
+	}
+
+	public String getIndustrySubSector() {
+		return industrySubSector;
+	}
+
+	public void setIndustrySubSector(String industrySubSector) {
+		this.industrySubSector = industrySubSector;
 	}
 }

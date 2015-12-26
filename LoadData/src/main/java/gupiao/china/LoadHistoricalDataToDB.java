@@ -212,6 +212,8 @@ public class LoadHistoricalDataToDB {
 				stock.setCurrentMarketPrice(rsL.getBigDecimal("currentMarketPrice"));
 				stock.setTotalMarketPrice(rsL.getBigDecimal("totalMarketPrice"));
 				stock.setDealNumber(rsL.getBigDecimal("dealNumber"));
+				stock.setIndustrySector(rsL.getString("industrySector"));
+				stock.setIndustrySubSector(rsL.getString("industrySubSector"));
 				stocks.add(stock);
 			}
 		} catch (SQLException e) {
