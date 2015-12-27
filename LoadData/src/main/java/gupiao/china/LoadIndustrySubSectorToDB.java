@@ -60,14 +60,19 @@ public class LoadIndustrySubSectorToDB {
 		String[] banKuai;
 		for (String bk:bkListUrl) {
 			banKuai=bk.split(";");
-			readBanKuai(driver, banKuai[0],banKuai[1]);
+			try {
+				readBanKuai(driver, banKuai[0],banKuai[1]);
+			} catch (Exception e) {
+				System.out.println("Fail to load sector: "+banKuai[0]);
+			}
 		}
-
 	}
 	
 	public void readBanKuai(WebDriver driver, String sector,String url) throws InterruptedException {
 		driver.get("http://127.0.0.1/");
+		System.out.println("Start load sector: "+sector);
 		driver.get(url);
+		//driver.get("http://quote.eastmoney.com/center/list.html#28002438_0_2");
 		Thread.sleep(2000);
 		WebElement element = driver.findElement(By.id("fixed"));
 		if (element==null) {
@@ -87,7 +92,7 @@ public class LoadIndustrySubSectorToDB {
         	element.click();
         	Thread.sleep(2000);
         	element=driver.findElement(By.id("pagenum"));
-        	if (element.getText().equals(""+lastPage)) {
+        	if (element.getAttribute("value").equals(""+lastPage)) {
         		break;
         	}
     		element = driver.findElement(By.id("fixed"));
