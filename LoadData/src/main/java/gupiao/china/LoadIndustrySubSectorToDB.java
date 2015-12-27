@@ -67,8 +67,7 @@ public class LoadIndustrySubSectorToDB {
 	
 	public void readBanKuai(WebDriver driver, String sector,String url) throws InterruptedException {
 		driver.get("http://127.0.0.1/");
-		//driver.get(url);
-		driver.get("http://quote.eastmoney.com/center/list.html#28002465_0_2");
+		driver.get(url);
 		Thread.sleep(2000);
 		WebElement element = driver.findElement(By.id("fixed"));
 		if (element==null) {
@@ -79,24 +78,27 @@ public class LoadIndustrySubSectorToDB {
 		String tableSource=element.getAttribute("innerHTML");
         getDataRow(sector,tableSource);
         
-        element=driver.findElement(By.id("pagenav"));
-        List<WebElement> aElements=element.findElements(By.xpath("//a"));
-        for (WebElement e:aElements) {
-        	if (e.getText().equalsIgnoreCase("下一页") && e.getAttribute("class").equalsIgnoreCase("disable")) {
+        int lastPage=1;
+        while (true) {
+        	element=driver.findElement(By.id("pagenum"));
+        	element.clear();
+        	element.sendKeys(lastPage+1+"");
+        	element=driver.findElement(By.id("page-go"));
+        	element.click();
+        	Thread.sleep(2000);
+        	element=driver.findElement(By.id("pagenum"));
+        	if (element.getText().equals(""+lastPage)) {
         		break;
-        	} else if (e.getText().equalsIgnoreCase("下一页")) {
-        		e.click();
-        		Thread.sleep(2000);
-        		element = driver.findElement(By.id("fixed"));
-        		if (element==null) {
-        			System.out.println("unable find fixed for sector "+sector+", URL="+url);
-        			return;
-        		}
+        	}
+    		element = driver.findElement(By.id("fixed"));
+    		if (element==null) {
+    			System.out.println("unable find fixed for sector "+sector+", URL="+url);
+    			return;
+    		}
 
-        		tableSource=element.getAttribute("innerHTML");
-                getDataRow(sector,tableSource);
-                aElements=element.findElements(By.xpath("//a"));
-        	} 
+    		tableSource=element.getAttribute("innerHTML");
+            getDataRow(sector,tableSource);
+            lastPage++;
         }
     }
 	
