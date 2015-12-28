@@ -466,7 +466,7 @@ public class AnalysisHistoricalData {
 		int longdays = 26;
 		int signaldays = 9;
 		if (stocks.size() < 40) {
-			System.out.println("Too little date to calculate MACD");
+			System.out.println("Too little date to calculate MACD for "+stocks.get(0).getCode());
 			return false;
 		}
 		float average12 = getAveragePriceForDays(stocks, shortdays);

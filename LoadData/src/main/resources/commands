@@ -2,6 +2,10 @@ scp ubuntu@10.99.3.4:/home/ubuntu/gu/gupiao.db /disk1/git/gu/LoadData/src/main/r
 
 scp /disk1/git/gu/LoadData-0.0.1-SNAPSHOT.jar ubuntu@10.99.3.4:/home/ubuntu/gu/
 
+scp /disk1/git/gu/LoadData/target/LoadData-0.0.1-SNAPSHOT-jar-with-dependencies.jar ubuntu@10.99.3.4:/home/ubuntu/gu/LoadData-0.0.1-SNAPSHOT.jar
+
+scp /disk1/git/gu/LoadData/src/main/resources/gu.properties ubuntu@10.99.3.4:/home/ubuntu/gu/
+
 sqlite3 /disk1/git/gu/LoadData/src/main/resources/gupiao.db "select * from stockLoadRecord where season='1';"
 
 sqlite3 /home/ubuntu/gu/gupiao.db "select * from stockLoadRecord where season='1';"
