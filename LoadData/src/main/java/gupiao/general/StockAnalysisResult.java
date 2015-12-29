@@ -12,6 +12,7 @@ public class StockAnalysisResult {
 	private int daysFromLastOpen;
 	private int daysFromLowestPrice;
 	private PriceTrend priceTrend;
+	private int redKline;
 
 	public enum PriceTrend {
 		GODOWN("GoDown"),GOUPGREEN("GoUpGreen"),GOUPMIX("GoUpMix"),GOUPRED("GoUpRed");
@@ -78,7 +79,7 @@ public class StockAnalysisResult {
 		this.daysFromLowestPrice = daysFromLowestPrice;
 	}
 	public static String getTitles() {
-		return "code,name,current price, highest price, lowest price, rate to high, rate to low, price rate,days from last open, days from lowest price, priceTrend, industrySector, industrySubSector";
+		return "code,name,current price, highest price, lowest price, rate to high, rate to low, price rate,days from last open, days from lowest price, priceTrend, redKline, industrySector, industrySubSector";
 	}
 	
 	public PriceTrend getPriceTrend() {
@@ -99,8 +100,14 @@ public class StockAnalysisResult {
 	public void setIndustrySubSector(String industrySubSector) {
 		this.industrySubSector = industrySubSector;
 	}
+	public int getRedKline() {
+		return redKline;
+	}
+	public void setRedKline(int redKline) {
+		this.redKline = redKline;
+	}
 	public String toString() {
 		return this.code+","+this.name+","+this.currentPrice+","+this.highestPrice+","
-				+this.lowestPrice+","+getRateToHigh()+","+getRateToLow()+","+getPriceRate()+","+this.daysFromLastOpen+","+this.daysFromLowestPrice+","+this.priceTrend.toString()+","+this.industrySector+","+this.industrySubSector;
+				+this.lowestPrice+","+getRateToHigh()+","+getRateToLow()+","+getPriceRate()+","+this.daysFromLastOpen+","+this.daysFromLowestPrice+","+this.priceTrend.toString()+","+this.redKline+","+this.industrySector+","+this.industrySubSector;
 	}
 }

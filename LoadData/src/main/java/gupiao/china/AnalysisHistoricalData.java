@@ -205,6 +205,7 @@ public class AnalysisHistoricalData {
 			sAnalysis.setDaysFromLowestPrice(daysFromLowestPrice);
 			sAnalysis.setDaysFromLastOpen(daysFromLastOpen);
 			sAnalysis.setPriceTrend(getPriceTrend(stockRecord));
+			sAnalysis.setRedKline(getRedKline(stockRecord));
 			// System.out.println("step1");
 			String data = sAnalysis.toString() + "\r\n";
 
@@ -227,6 +228,24 @@ public class AnalysisHistoricalData {
 				}
 			}
 		}
+	}
+
+	private int getRedKline(List<StockDealRecord> stockRecord) {
+		int days=5;
+		if (stockRecord.size()<days) {
+			return 0;
+		}
+		int redK=0;
+		StockDealRecord sd;
+		for (int i=0;i<days;i++) {
+			sd=stockRecord.get(stockRecord.size()-i-1);
+			if (sd.getClosePrice()>sd.getOpenPrice() && sd.getOpenPrice()!=0) {
+				redK++;
+			} else {
+				break;
+			}
+		}
+		return redK;
 	}
 
 	private boolean reOpenStock(StockDealRecord stockDealRecord, StockDealRecord stockDealRecord2) {
