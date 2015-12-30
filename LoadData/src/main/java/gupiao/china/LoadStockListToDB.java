@@ -83,7 +83,6 @@ public class LoadStockListToDB {
             content = content.substring(endIndex);
             startIndex = content.indexOf(dataStart);
         }
-        System.out.println(records);
         return records;
     }
 

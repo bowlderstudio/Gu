@@ -83,9 +83,9 @@ public class LoadDealRecordToDB {
     }
 
 	private void saveStockToDB(String record) {
+		StockDealRecord stockDR= new StockDealRecord();
 		try {
 			String[] tokens=record.replaceAll("　", "").replaceAll(" ", "").split(";");
-			StockDealRecord stockDR= new StockDealRecord();
 			stockDR.setCode(tokens[0].substring(2));
 			stockDR.setName(tokens[1]);
 			stockDR.setDate(currentDate);
@@ -131,6 +131,9 @@ public class LoadDealRecordToDB {
 			psL.close();
 		} catch (SQLException e) {
 			System.err.println("Insert/Update data error: " + e);
+			e.printStackTrace();
+		} catch (Exception e) {
+			System.err.println("Error to load data for "+stockDR.getCode()+": " + e);
 			e.printStackTrace();
 		}
 		
