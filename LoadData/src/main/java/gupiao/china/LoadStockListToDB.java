@@ -137,13 +137,13 @@ public class LoadStockListToDB {
 			}
 			rsL.close();
 			
-			StockDealRecord stockDeal=new StockDealRecord();
-			stockDeal.setCode(stock.getCode());
-			stockDeal.setName(stock.getName());
-			stockDeal.setClosePrice(stock.getClosePrice());
-			stockDeal.setDate(currentDate);
-			stockDeal.setDealNumber(stock.getDealNumber());
-			LoadHistoricalDataToDB.saveStockDealToDB(conn, stockDeal, false);
+//			StockDealRecord stockDeal=new StockDealRecord();
+//			stockDeal.setCode(stock.getCode());
+//			stockDeal.setName(stock.getName());
+//			stockDeal.setClosePrice(stock.getClosePrice());
+//			stockDeal.setDate(currentDate);
+//			stockDeal.setDealNumber(stock.getDealNumber());
+//			LoadHistoricalDataToDB.saveStockDealToDB(conn, stockDeal, false);
 			
 			psL.close();
 		} catch (SQLException e) {

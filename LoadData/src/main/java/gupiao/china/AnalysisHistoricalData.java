@@ -313,7 +313,12 @@ public class AnalysisHistoricalData {
 	}
 
 	private boolean isExpectedMarketPrice(String code) {
-		return stockMap.get(code).getTotalMarketPrice().compareTo(highestMarketPrice) <=0 ;
+		if (stockMap.get(code)!=null && stockMap.get(code).getTotalMarketPrice()!=null)
+			return stockMap.get(code).getTotalMarketPrice().compareTo(highestMarketPrice) <=0 ;
+		else {
+			System.out.println("missing market price "+code);
+			return true;
+		}
 	}
 
 	private boolean isFuquan(StockDealRecord record1, StockDealRecord record2) {
