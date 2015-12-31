@@ -206,6 +206,7 @@ public class AnalysisHistoricalData {
 			sAnalysis.setDaysFromLastOpen(daysFromLastOpen);
 			sAnalysis.setPriceTrend(getPriceTrend(stockRecord));
 			sAnalysis.setRedKline(getRedKline(stockRecord));
+			sAnalysis.setRedSoldier(getRedSoldier(stockRecord));
 			// System.out.println("step1");
 			String data = sAnalysis.toString() + "\r\n";
 
@@ -246,6 +247,18 @@ public class AnalysisHistoricalData {
 			}
 		}
 		return redK;
+	}
+	
+	private boolean getRedSoldier(List<StockDealRecord> stockRecord) {
+		if (stockRecord.size()<3) {
+			return false;
+		}
+		boolean redS=false;
+		if (stockRecord.get(0).getDealNumber().compareTo(stockRecord.get(1).getDealNumber())<=0
+				|| stockRecord.get(0).getDealNumber().compareTo(stockRecord.get(2).getDealNumber())<=0) {
+			redS=true;
+		}
+		return redS;
 	}
 
 	private boolean reOpenStock(StockDealRecord stockDealRecord, StockDealRecord stockDealRecord2) {

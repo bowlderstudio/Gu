@@ -93,7 +93,7 @@ public class LoadDealRecordToDB {
 			stockDR.setOpenPrice(tokens[8]);
 			stockDR.setHighestPrice(tokens[9]);
 			stockDR.setLowestPrice(tokens[10]);
-			stockDR.setDealNumber(tokens[11]);
+			stockDR.setDealNumber(tokens[11]+"00");
 			stockDR.setDealAmount(tokens[12]);
 			
 			PreparedStatement psL = conn.prepareStatement("SELECT * FROM stocks WHERE code=?");
