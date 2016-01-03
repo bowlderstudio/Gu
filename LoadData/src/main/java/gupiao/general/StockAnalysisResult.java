@@ -14,11 +14,25 @@ public class StockAnalysisResult {
 	private PriceTrend priceTrend;
 	private int redKline;
 	private boolean redSoldier;
+	private float averageLineSlope;
+	private LineHead lineHead;
 
 	public enum PriceTrend {
 		GODOWN("GoDown"),GOUPGREEN("GoUpGreen"),GOUPMIX("GoUpMix"),GOUPRED("GoUpRed");
 		private String code;
         private PriceTrend(String code) {
+            this.code = code;
+        }
+        @Override
+        public String toString() {
+            return String.valueOf(code);
+        }
+	};
+	
+	public enum LineHead {
+		HEADUP("HeadUp"),HEADDOWN("HeadDown"),HEADUNKNOWN("HeadUnknown");
+		private String code;
+        private LineHead(String code) {
             this.code = code;
         }
         @Override
@@ -80,7 +94,9 @@ public class StockAnalysisResult {
 		this.daysFromLowestPrice = daysFromLowestPrice;
 	}
 	public static String getTitles() {
-		return "code,name,current price, highest price, lowest price, rate to high, rate to low, price rate,days from last open, days from lowest price, priceTrend, redKline, redSoldier, industrySector, industrySubSector";
+		return "code,name,current price, highest price, lowest price, rate to high, rate to low, "
+				+ "price rate,days from last open, days from lowest price, priceTrend, redKline, "
+				+ "redSoldier, averageLineSlope, lineHead, industrySector, industrySubSector";
 	}
 	
 	public PriceTrend getPriceTrend() {
@@ -113,10 +129,22 @@ public class StockAnalysisResult {
 	public void setRedSoldier(boolean redSoldier) {
 		this.redSoldier = redSoldier;
 	}
+	public float getAverageLineSlope() {
+		return averageLineSlope;
+	}
+	public void setAverageLineSlope(float averageLineSlope) {
+		this.averageLineSlope = averageLineSlope;
+	}
+	public LineHead getLineHead() {
+		return lineHead;
+	}
+	public void setLineHead(LineHead lineHead) {
+		this.lineHead = lineHead;
+	}
 	public String toString() {
 		return this.code+","+this.name+","+this.currentPrice+","+this.highestPrice+","
 				+this.lowestPrice+","+getRateToHigh()+","+getRateToLow()+","+getPriceRate()+","
 				+this.daysFromLastOpen+","+this.daysFromLowestPrice+","+this.priceTrend.toString()+","
-				+this.redKline+","+this.redSoldier+","+this.industrySector+","+this.industrySubSector;
+				+this.redKline+","+this.redSoldier+","+this.averageLineSlope+","+this.lineHead+","+this.industrySector+","+this.industrySubSector;
 	}
 }

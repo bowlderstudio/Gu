@@ -3,6 +3,7 @@ package gupiao.china;
 import gupiao.general.StockDealRecord;
 import gupiao.general.Stock;
 import gupiao.general.StockAnalysisResult;
+import gupiao.general.StockAnalysisResult.LineHead;
 import gupiao.general.StockAnalysisResult.PriceTrend;
 import gupiao.general.StockComparator;
 
@@ -144,7 +145,7 @@ public class AnalysisHistoricalData {
 	private void analysisData(Stock stock) {
 		String stockCode = stock.getCode();
 		// TODO for debug
-		if (stockCode.equals("002780")) {
+		if (stockCode.equals("600432")) {
 			System.out.print("");
 		}
 		List<StockDealRecord> stockRecord = getDealRecordFromDB(stockCode);
@@ -207,6 +208,9 @@ public class AnalysisHistoricalData {
 			sAnalysis.setPriceTrend(getPriceTrend(stockRecord));
 			sAnalysis.setRedKline(getRedKline(stockRecord));
 			sAnalysis.setRedSoldier(getRedSoldier(stockRecord));
+			sAnalysis.setAverageLineSlope(getAverageLineSlope(stockRecord));
+			sAnalysis.setLineHead(getLineHead(stockRecord));
+			
 			// System.out.println("step1");
 			String data = sAnalysis.toString() + "\r\n";
 
@@ -220,15 +224,64 @@ public class AnalysisHistoricalData {
 					imageUrl = diagramURL.replaceAll("CODE%", stockCode).replaceAll("TYPE%", "1");
 				}
 
-				if (isMACDRaise(stockRecord)) {
-					saveImage(imageUrl, diagramFold + "HistogramUp" + stockCode + ".png");
-				} else if (isMacdMinus(stockRecord)) {
-					saveImage(imageUrl, diagramFold + "HistogramMinus" + stockCode + ".png");
-				} else if (isMacdDown(stockRecord)) {
-					saveImage(imageUrl, diagramFold + "HistogramDown" + stockCode + ".png");
+				if (sAnalysis.getLineHead()==LineHead.HEADUP) {
+					saveImage(imageUrl, diagramFold + "HEADUP" + stockCode + ".png");
+				} else if (sAnalysis.getLineHead()==LineHead.HEADDOWN) {
+					saveImage(imageUrl, diagramFold + "HEADDOWN" + stockCode + ".png");
 				}
 			}
 		}
+	}
+
+	private LineHead getLineHead(List<StockDealRecord> stockRecord) {
+		float average5=0,average10=0,average20=0;
+		if (stockRecord.size()<20) {
+			return LineHead.HEADUNKNOWN;
+		}
+		int averageDays=20;
+		for (int i=0;i<averageDays;i++) {
+			if (i<5) {
+				average5+=stockRecord.get(stockRecord.size()-i-1).getClosePrice();
+			}
+			if (i<10) {
+				average10+=stockRecord.get(stockRecord.size()-i-1).getClosePrice();
+			}
+			average20+=stockRecord.get(stockRecord.size()-i-1).getClosePrice();
+		}
+		average5=average5/5;
+		average10=average10/10;
+		average20=average20/20;
+		if (stockRecord.get(stockRecord.size()-1).getClosePrice() >=average5 
+				&& average5>=average10 && average10>=average20) {
+			return LineHead.HEADUP;
+		} else if (stockRecord.get(stockRecord.size()-1).getClosePrice() <=average5 
+				&& average5<=average10 && average10<=average20){
+			return LineHead.HEADDOWN;
+		} else {
+			return LineHead.HEADUNKNOWN;
+		}
+	}
+
+	private float getAverageLineSlope(List<StockDealRecord> stockRecord) {
+		int internalDays=3;
+		int averageDays=20;
+		if (stockRecord.size()<averageDays+internalDays) {
+			System.out.println("Too little to calculate average line slop");
+			return 0;
+		}
+		float average1=0.0f;
+		for (int i=0;i<averageDays;i++) {
+			average1+=stockRecord.get(stockRecord.size()-i-1).getClosePrice();
+		}
+		average1=average1/averageDays;
+		
+		float average2=0;
+		for (int i=0;i<averageDays;i++) {
+			average2+=stockRecord.get(stockRecord.size()-i-internalDays-1).getClosePrice();
+		}
+		average2=average2/averageDays;
+		float slope=(average1-average2)/internalDays;
+		return slope;
 	}
 
 	private int getRedKline(List<StockDealRecord> stockRecord) {
@@ -254,8 +307,9 @@ public class AnalysisHistoricalData {
 			return false;
 		}
 		boolean redS=false;
-		if (stockRecord.get(0).getDealNumber().compareTo(stockRecord.get(1).getDealNumber())<=0
-				|| stockRecord.get(0).getDealNumber().compareTo(stockRecord.get(2).getDealNumber())<=0) {
+		if (stockRecord.get(1).getDealNumber().compareTo(stockRecord.get(2).getDealNumber())<=0
+				|| stockRecord.get(0).getDealNumber().compareTo(stockRecord.get(2).getDealNumber())<=0
+				|| stockRecord.get(0).getDealNumber().compareTo(stockRecord.get(1).getDealNumber())<=0) {
 			redS=true;
 		}
 		return redS;
