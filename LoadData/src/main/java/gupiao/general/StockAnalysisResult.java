@@ -16,6 +16,7 @@ public class StockAnalysisResult {
 	private boolean redSoldier;
 	private float averageLineSlope;
 	private LineHead lineHead;
+	private float priceVSAverageLine;
 
 	public enum PriceTrend {
 		GODOWN("GoDown"),GOUPGREEN("GoUpGreen"),GOUPMIX("GoUpMix"),GOUPRED("GoUpRed");
@@ -96,7 +97,7 @@ public class StockAnalysisResult {
 	public static String getTitles() {
 		return "code,name,current price, highest price, lowest price, rate to high, rate to low, "
 				+ "price rate,days from last open, days from lowest price, priceTrend, redKline, "
-				+ "redSoldier, averageLineSlope, lineHead, industrySector, industrySubSector";
+				+ "redSoldier, averageLineSlope, lineHead, priceToAverageLine, industrySector, industrySubSector";
 	}
 	
 	public PriceTrend getPriceTrend() {
@@ -141,10 +142,17 @@ public class StockAnalysisResult {
 	public void setLineHead(LineHead lineHead) {
 		this.lineHead = lineHead;
 	}
+	public float getPriceVSAverageLine() {
+		return priceVSAverageLine;
+	}
+	public void setPriceVSAverageLine(float priceVSAverageLine) {
+		this.priceVSAverageLine = priceVSAverageLine;
+	}
 	public String toString() {
 		return this.code+","+this.name+","+this.currentPrice+","+this.highestPrice+","
 				+this.lowestPrice+","+getRateToHigh()+","+getRateToLow()+","+getPriceRate()+","
 				+this.daysFromLastOpen+","+this.daysFromLowestPrice+","+this.priceTrend.toString()+","
-				+this.redKline+","+this.redSoldier+","+this.averageLineSlope+","+this.lineHead+","+this.industrySector+","+this.industrySubSector;
+				+this.redKline+","+this.redSoldier+","+this.averageLineSlope+","+this.lineHead+","
+				+this.priceVSAverageLine+","+this.industrySector+","+this.industrySubSector;
 	}
 }

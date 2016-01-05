@@ -210,7 +210,7 @@ public class AnalysisHistoricalData {
 			sAnalysis.setRedSoldier(getRedSoldier(stockRecord));
 			sAnalysis.setAverageLineSlope(getAverageLineSlope(stockRecord));
 			sAnalysis.setLineHead(getLineHead(stockRecord));
-			
+			sAnalysis.setPriceVSAverageLine(getPriceToAverageLine(stockRecord));
 			// System.out.println("step1");
 			String data = sAnalysis.toString() + "\r\n";
 
@@ -231,6 +231,20 @@ public class AnalysisHistoricalData {
 				}
 			}
 		}
+	}
+
+	private float getPriceToAverageLine(List<StockDealRecord> stockRecord) {
+		float average20=0;
+		if (stockRecord.size()<20) {
+			return 0;
+		}
+		int averageDays=20;
+		for (int i=0;i<averageDays;i++) {
+			average20+=stockRecord.get(stockRecord.size()-i-1).getClosePrice();
+		}
+		average20=average20/averageDays;
+		float currentPrice=stockRecord.get(stockRecord.size()-1).getClosePrice();
+		return (currentPrice-average20)/currentPrice;
 	}
 
 	private LineHead getLineHead(List<StockDealRecord> stockRecord) {
