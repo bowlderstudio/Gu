@@ -14,6 +14,6 @@ sqlite3 /home/ubuntu/gu/gupiao.db "delete from stockLoadRecord where season='4';
 
 sqlite3 /disk1/git/gu/LoadData/src/main/resources/gupiao.db "delete from stockLoadRecord where season='4';"
 
-sqlite3 /disk1/git/gu/LoadData/src/main/resources/gupiao.db "select count(*) from stockLoadRecord where season='4';"
+sqlite3 /disk1/git/gu/LoadData/src/main/resources/gupiao.db "select date,code,name,closePrice from stockDealRecord where date='2016-01-07';"
 
 sqlite3 /disk1/git/gu/LoadData/src/main/resources/gupiao.db "ALTER TABLE stocks ADD industrySubSector VARCHAR(50) NULL;"

@@ -10,6 +10,7 @@ public class StockDealRecord {
     private float highestPrice;
     private float lowestPrice;
     private float closePrice;
+    private float increaseRate;
     private BigDecimal dealNumber;
     private BigDecimal dealAmount;
     private float ema12;
@@ -64,7 +65,11 @@ public class StockDealRecord {
 	}
 	
 	public void setHighestPrice(String highestPrice) {
-		this.highestPrice = Float.parseFloat(highestPrice);
+		try{
+			this.highestPrice = Float.parseFloat(highestPrice);
+		} catch (java.lang.NumberFormatException e) {
+			this.highestPrice = 0;
+		}
 	}
 
 	public float getLowestPrice() {
@@ -76,7 +81,11 @@ public class StockDealRecord {
 	}
 	
 	public void setLowestPrice(String lowestPrice) {
-		this.lowestPrice = Float.parseFloat(lowestPrice);
+		try{
+			this.lowestPrice = Float.parseFloat(lowestPrice);
+		} catch (java.lang.NumberFormatException e) {
+			this.lowestPrice = 0;
+		}
 	}
 
 	public BigDecimal getDealNumber() {
@@ -88,7 +97,11 @@ public class StockDealRecord {
 	}
 	
 	public void setDealNumber(String dealNumber) {
-		this.dealNumber = new BigDecimal(dealNumber);
+		try{
+			this.dealNumber = new BigDecimal(dealNumber);
+		} catch (java.lang.NumberFormatException e) {
+			this.dealNumber = new BigDecimal(0);
+		}
 	}
 
 	public BigDecimal getDealAmount() {
@@ -100,7 +113,11 @@ public class StockDealRecord {
 	}
 	
 	public void setDealAmount(String dealAmount) {
-		this.dealAmount = new BigDecimal(dealAmount);
+		try{
+			this.dealAmount = new BigDecimal(dealAmount);
+		} catch (java.lang.NumberFormatException e) {
+			this.dealAmount = new BigDecimal(0);
+		}
 	}
 
 	public String getDate() {
@@ -120,7 +137,11 @@ public class StockDealRecord {
     }
     
     public void setClosePrice(String closePrice) {
-        this.closePrice = Float.parseFloat(closePrice);
+    	try{
+    		this.closePrice = Float.parseFloat(closePrice);
+		} catch (java.lang.NumberFormatException e) {
+			this.closePrice = 0;
+		}
     }
 
     public float getEma12() {
@@ -163,7 +184,23 @@ public class StockDealRecord {
         this.histogram = histogram;
     }
 
-    public String getCode() {
+    public float getIncreaseRate() {
+		return increaseRate;
+	}
+
+	public void setIncreaseRate(float increaseRate) {
+		this.increaseRate = increaseRate;
+	}
+	
+	public void setIncreaseRate(String increaseRate) {
+		try{
+			this.increaseRate = Float.parseFloat(increaseRate);
+		} catch (java.lang.NumberFormatException e) {
+			this.increaseRate = 0;
+		}
+	}
+
+	public String getCode() {
         return code;
     }
 

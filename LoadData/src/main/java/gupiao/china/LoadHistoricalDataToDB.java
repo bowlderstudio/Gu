@@ -127,8 +127,8 @@ public class LoadHistoricalDataToDB {
 			ResultSet rsL = psL.executeQuery();
 			if (!rsL.next()) {
 				psL = conn.prepareStatement("INSERT INTO stockDealRecord"
-						+ " (code,name,date,openPrice,closePrice,highestPrice,lowestPrice,dealAmount,dealNumber) "
-						+ "VALUES (?,?,?,?,?,?,?,?,?)");
+						+ " (code,name,date,openPrice,closePrice,highestPrice,lowestPrice,dealAmount,dealNumber,increastRate) "
+						+ "VALUES (?,?,?,?,?,?,?,?,?,?)");
 	
 				psL.setString(1, stockDeal.getCode());
 				psL.setString(2, stockDeal.getName());
@@ -139,11 +139,12 @@ public class LoadHistoricalDataToDB {
 				psL.setFloat(7, stockDeal.getLowestPrice());
 				psL.setBigDecimal(8, stockDeal.getDealAmount());
 				psL.setBigDecimal(9, stockDeal.getDealNumber());
+				psL.setFloat(10, stockDeal.getIncreaseRate());
 	
 				psL.execute();
 			} else if (allowedUpdate){
 				psL = conn.prepareStatement("UPDATE stockDealRecord SET"
-						+ " code=?,name=?,date=?,openPrice=?,closePrice=?,highestPrice=?,lowestPrice=?,dealAmount=?,dealNumber=? "
+						+ " code=?,name=?,date=?,openPrice=?,closePrice=?,highestPrice=?,lowestPrice=?,dealAmount=?,dealNumber=?,increastRate=? "
 						+ " WHERE code=? and date=?");
 	
 				psL.setString(1, stockDeal.getCode());
@@ -155,8 +156,9 @@ public class LoadHistoricalDataToDB {
 				psL.setFloat(7, stockDeal.getLowestPrice());
 				psL.setBigDecimal(8, stockDeal.getDealAmount());
 				psL.setBigDecimal(9, stockDeal.getDealNumber());
-				psL.setString(10, stockDeal.getCode());
-				psL.setString(11, stockDeal.getDate());
+				psL.setFloat(10, stockDeal.getIncreaseRate());
+				psL.setString(11, stockDeal.getCode());
+				psL.setString(12, stockDeal.getDate());
 	
 				psL.execute();
 			}

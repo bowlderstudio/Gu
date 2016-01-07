@@ -90,6 +90,7 @@ public class LoadDealRecordToDB {
 			stockDR.setName(tokens[1]);
 			stockDR.setDate(currentDate);
 			stockDR.setClosePrice(tokens[2].trim());
+			stockDR.setIncreaseRate(tokens[4].replaceAll("\\+", "").replaceAll("%", ""));
 			stockDR.setOpenPrice(tokens[8]);
 			stockDR.setHighestPrice(tokens[9]);
 			stockDR.setLowestPrice(tokens[10]);
@@ -99,7 +100,7 @@ public class LoadDealRecordToDB {
 			PreparedStatement psL = conn.prepareStatement("SELECT * FROM stocks WHERE code=?");
 			psL.setString(1, stockDR.getCode());
 			ResultSet rsL = psL.executeQuery();
-			String code="";
+			String sname="";
 			if (!rsL.next()) {
 				psL = conn.prepareStatement("INSERT INTO stocks"
 						+ " (code,name,closePrice,dealNumber) "
@@ -112,12 +113,12 @@ public class LoadDealRecordToDB {
 	
 				psL.execute();
 			} else {
-				code=rsL.getString("name");
+				sname=rsL.getString("name");
 				psL = conn.prepareStatement("UPDATE stocks SET "
 						+ " code=?,name=?,closePrice=?,dealNumber=? WHERE code=? ");
 	
 				psL.setString(1, stockDR.getCode());
-				psL.setString(2, code);
+				psL.setString(2, sname);
 				psL.setFloat(3, stockDR.getClosePrice());
 				psL.setBigDecimal(4, stockDR.getDealNumber());
 				psL.setString(5, stockDR.getCode());
@@ -127,7 +128,9 @@ public class LoadDealRecordToDB {
 			rsL.close();
 			
 			if (stockDR.getOpenPrice()>0) {
-				stockDR.setName(code);
+				if (!sname.isEmpty()) {
+					stockDR.setName(sname);
+				}
 				LoadHistoricalDataToDB.saveStockDealToDB(conn, stockDR, true);
 			}
 			
